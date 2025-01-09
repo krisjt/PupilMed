@@ -1,0 +1,97 @@
+SECURITY CONFIG
+
+                            authorize.requestMatchers("/css/**", "/js/**", "/images/**").permitAll();
+//        return http.authorizeHttpRequests(
+//                        authorize -> {
+//                            // Permit access to static resources and login, home, and error pages
+//                            authorize.requestMatchers("/login", "/error/**", "/").permitAll();
+//                            // Restrict access to admin and user pages based on roles
+//                            authorize.requestMatchers("/admin/**").hasRole("ADMIN");
+//                            authorize.requestMatchers("/owner/**").hasRole("OWNER");
+//                            authorize.requestMatchers("/vet/**").hasRole("VET");
+//                            // All other requests require authentication
+//                            authorize.anyRequest().authenticated();
+//                        }
+//                ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+//                .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .userDetailsService(userDetailService)
+//                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+
+
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+//        daoAuthenticationProvider.setUserDetailsService(userDetailService);
+//        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+//        return daoAuthenticationProvider;
+//    }
+
+//                .formLogin(formLogin -> formLogin
+//                        .loginPage("/login")  // Custom login page
+//                        .defaultSuccessUrl("/", true)  // Redirect to home after successful login
+//                        .permitAll())
+//                .logout(logout -> logout.logoutUrl("/logout")
+//                        .logoutSuccessUrl("/login?logout")  // Redirect to login page after logout
+//                        .permitAll()
+//                )
+
+AUTH CONTROLLER
+
+
+//        Authentication authentication;
+//        authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        String jwt = jwtUtils.generateToken((UserDetails) authentication.getPrincipal());
+//
+//        String jwtU =
+//        return ResponseEntity.ok(new JwtResponse(jwt));
+
+
+
+@Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isPresent()) {
+            String role = "ADMIN";
+
+            if (vetRepository.existsByUser(userOptional.get().getId())) {
+                role = "VET";
+            }
+            if (ownerRepository.existsByUserID(userOptional.get().getId())) {
+                role = "OWNER";
+            }
+
+            System.out.println("USEr");
+            System.out.println(userOptional.get().getUsername());
+            System.out.println(userOptional.get().getPassword());
+            System.out.println("ROLE ");
+            System.out.println(" + role");
+
+            //TODO
+//            if (role.equals("")) {}
+            User user = userOptional.get();
+
+            if (!user.isActive()) {
+                throw new DisabledException("User is not active");
+            }
+
+            System.out.println();
+            System.out.println(user.getUsername());
+            System.out.println(user.getPassword());
+            System.out.println("Role = " + user.getRole());
+            System.out.println();
+
+            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .roles(role)
+                    .build();
+        } else {
+            throw new UsernameNotFoundException(username);
+        }
+    }
