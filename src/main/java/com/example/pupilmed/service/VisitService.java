@@ -88,7 +88,7 @@ public class VisitService{
 
                 if (validation.getStatusCode() == HttpStatus.OK) {
 
-                    Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumer());
+                    Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
                     Pet pet = petService.getPetByNameAndOwner(payload.petName(), owner);
 
                     dbVisit.setDate(parseDate(payload.date()));
@@ -170,7 +170,7 @@ public class VisitService{
         ResponseEntity<String> validation = validateVisitData(vet,payload);
 
         if((validation.hasBody() && validation.getBody().equals("Visit does not exist."))||validation.getStatusCode()==HttpStatus.OK){
-            Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumer());
+            Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
             Pet pet = petService.getPetByNameAndOwner(payload.petName(),owner);
             Visit visit = new Visit(parseDate(payload.date()), parseTime(payload.hour()), payload.visitType(), payload.price(), vet, pet);
             visitRepository.save(visit);
@@ -180,13 +180,13 @@ public class VisitService{
     }
 
     private ResponseEntity<String> validateVisitData(Vet vet, VetVisitRequest payload) {
-        String phoneNumber = payload.ownerPhoneNumer();
+        String phoneNumber = payload.ownerPhoneNumber();
 
         if (!userService.existsByUsernameAndRole(phoneNumber, Role.OWNER)) {
             return new ResponseEntity<>("Owner does not exist.", HttpStatus.NOT_FOUND);
         }
         String petName = payload.petName();
-        Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumer());
+        Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
 
         if (!petService.existsByNameAndUser(petName, owner))
             return new ResponseEntity<>("Pet is not related to the owner.", HttpStatus.BAD_REQUEST);

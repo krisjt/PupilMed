@@ -2,6 +2,7 @@ package com.example.pupilmed.controllers;
 
 import com.example.pupilmed.models.database.visit.Visit;
 import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
+import com.example.pupilmed.models.server.visit.VetVisitDetails;
 import com.example.pupilmed.models.server.visit.VetVisitRequest;
 import com.example.pupilmed.security.jwt.JwtUtils;
 import com.example.pupilmed.service.OwnerService;
@@ -20,7 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
@@ -47,10 +47,10 @@ public class AdminController {
     @PostMapping("/add-visit")
     public ResponseEntity<String> addVisit(@RequestBody VetVisitRequest payload ){
 
-        if(payload.vetPhoneNumer() != null) {
-            String vetPhoneNumer = payload.vetPhoneNumer();
+        if(payload.vetPhoneNumber() != null) {
+            String vetPhoneNumber = payload.vetPhoneNumber();
 
-            Vet vet = vetService.getVetByUsername(vetPhoneNumer);
+            Vet vet = vetService.getVetByUsername(vetPhoneNumber);
 
             if (vet != null)
                 return visitService.addVisit(vet, payload);
@@ -59,9 +59,16 @@ public class AdminController {
         }
         return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
     }
+
+    @GetMapping("/visit-details")
+    public VetVisitDetails getVisitDetails(@RequestParam("visitID") Integer visitID) {
+        return visitService.getVisitDetails(visitID);
+    }
+
     @PutMapping("/modify-visit")
     public ResponseEntity<String> modifyVisit(@RequestBody VetVisitRequest payload) {
-        if(payload.vetPhoneNumer() == null)
+        System.out.println("payload:" + payload);
+        if(payload.vetPhoneNumber() == null)
             return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
         return visitService.modifyVisit(payload);
     }
