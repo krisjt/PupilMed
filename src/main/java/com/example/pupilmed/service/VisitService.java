@@ -122,6 +122,12 @@ public class VisitService{
         return new ArrayList<>();
     }
 
+    public List<Visit> getVisitSBetweenDates(Date startDate, Date endDate) {
+        if(startDate.before(endDate))
+            return visitRepository.getVisitByDateBetween(startDate,endDate);
+        return null;
+    }
+
     public VetVisitDetails getVisitDetails(int visitID){
         Optional<Visit> optVisit = getVisitByID(visitID);
 

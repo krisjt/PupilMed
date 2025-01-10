@@ -36,6 +36,8 @@ public class RecommendationService {
     }
 
     public ResponseEntity<String> modifyRecommendation(VetRecommendationRequest payload) {
+        System.out.println("payload:" + payload);
+
         Optional<Visit> visit = visitService.getVisitByID(payload.visitID());
         if(visit.isPresent() && visit.get().getRecommendation() != null){
             Recommendation recommendation = visit.get().getRecommendation();
@@ -64,6 +66,7 @@ public class RecommendationService {
     }
 
 public ResponseEntity<String> addRecommendation(VetRecommendationRequest payload) {
+    System.out.printf("payload:" + payload);
 
     if (payload == null || payload.visitID() == null || payload.recommendation() == null) {
         return new ResponseEntity<>("Invalid payload: visitID or recommendation is missing.", HttpStatus.BAD_REQUEST);

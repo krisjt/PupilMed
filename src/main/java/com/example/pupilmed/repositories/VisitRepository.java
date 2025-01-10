@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface VisitRepository extends JpaRepository<Visit,Long> {
     public List<Visit> getVisitsByPet_Id(int id);
     public List<Visit> getVisitsByVet_Id(int id);
+    List<Visit> getVisitByDateBetween(Date start, Date end);
     Optional<Visit> getVisitById(int id);
 //    OVisit> getVisitById(int id);
     boolean existsByDateAndVetAndHour(Date date, Vet vet, Time hour);

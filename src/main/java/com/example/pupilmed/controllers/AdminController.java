@@ -12,6 +12,9 @@ import com.example.pupilmed.service.VisitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -49,6 +52,24 @@ public class AdminController {
     @GetMapping("/visits-all")
     public List<Visit> getAllVisits(){
         return visitService.getAllVisits();
+    }
+
+    @GetMapping("/visits-by-date")
+    public List<Visit> getVisitsByDate(@RequestHeader("Authorization") String authHeader, @RequestParam("startDate") String startDateStr,
+                                       @RequestParam("endDate") String endDateStr) throws ParseException {
+        String token = authHeader.replace("Bearer ", "");
+
+        if (!jwtUtils.validateJwtToken(token)) {
+            throw new RuntimeException("Invalid or expired token");
+        }
+
+        String username = jwtUtils.getUsernameFromJwtToken(token);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = dateFormat.parse(startDateStr);
+        Date endDate = dateFormat.parse(endDateStr);
+
+        return visitService.getVisitSBetweenDates(startDate,endDate);
     }
 
     //NIE SPRAWDZONE STARE EP
