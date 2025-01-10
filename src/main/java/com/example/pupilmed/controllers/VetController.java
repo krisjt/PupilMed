@@ -135,7 +135,7 @@ public class VetController {
         return visitService.addVisit(vet,payload);
     }
 
-    private String getUsernameFromToken(String authHeader){
+    private String getUsernameFromToken(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
 
         if (!jwtUtils.validateJwtToken(token)) {

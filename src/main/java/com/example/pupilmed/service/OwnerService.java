@@ -2,6 +2,7 @@ package com.example.pupilmed.service;
 
 import com.example.pupilmed.models.database.owner.Owner;
 import com.example.pupilmed.models.database.user.User;
+import com.example.pupilmed.models.database.vet.Vet;
 import com.example.pupilmed.repositories.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,10 @@ public class OwnerService {
     public Owner getOwnerByUserID(User user) {
         return ownerRepository.findOwnerByUser(user);
     }
-    public Owner getOwnerByUsername(String username) {
-        return ownerRepository.findOwnerByUser_Username(username);
+    public Owner getOwnerByUsername(String user) {
+        return ownerRepository.findOwnerByUser_Username(user);
     }
-
+    public Owner getOwnerByUser(User user){
+        return ownerRepository.getOwnerByUser(user);
+    }
 }

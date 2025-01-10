@@ -19,6 +19,7 @@ public interface VisitRepository extends JpaRepository<Visit,Long> {
 //    OVisit> getVisitById(int id);
     boolean existsByDateAndVetAndHour(Date date, Vet vet, Time hour);
     public List<Visit> getVisitsByVet_IdAndDateBetween(int id, Date start, Date end);
+    List<Visit> getVisitsByPet_IdAndDateBetween(int id, Date startDate, Date endDate);
     List<Visit> getVisitsByVetAndDateAndHour(Vet vet, Date date, Time hour);
 //    public Page<Visit> getAllVisits(Pageable pageable);
 }

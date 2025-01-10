@@ -28,6 +28,9 @@ public class PetService {
     public List<Pet> getPetsByVetID(int id) {
         return petRepository.findPetByOwner_Id(id);
     }
+    public List<Pet> getPetsByOwner(Owner owner) {
+        return petRepository.findByOwner(owner);
+    }
     public boolean existsByNameAndUser(String name, Owner owner){return petRepository.existsByNameAndOwner(name,owner);}
     public Pet getPetByNameAndOwner(String name, Owner owner){return petRepository.findPetByNameAndOwner(name, owner);}
 }
