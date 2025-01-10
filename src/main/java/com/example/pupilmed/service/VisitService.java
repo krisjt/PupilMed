@@ -125,6 +125,23 @@ public class VisitService{
         return new ArrayList<>();
     }
 
+    public List<Visit> getVisitsByOwnerUsernameBetweenDates(String username, Date startDate, Date endDate) {
+        User user = userService.getUserByUsername(username);
+        if (user != null) {
+            Owner owner = ownerService.getOwnerByUser(user);
+            if (owner != null) {
+                List<Pet> pets = petService.getPetsByOwner(owner);
+
+                List<Visit> visits = new ArrayList<>();
+                for (Pet pet : pets) {
+                    visits.addAll(visitRepository.getVisitsByPet_IdAndDateBetween(pet.getId(), startDate, endDate));
+                }
+                return visits;
+            }
+        }
+        return new ArrayList<>();
+    }
+
     public List<Visit> getVisitSBetweenDates(Date startDate, Date endDate) {
         if(startDate.before(endDate))
             return visitRepository.getVisitByDateBetween(startDate,endDate);

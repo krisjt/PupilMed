@@ -11,6 +11,7 @@ import java.util.List;
 public interface PetRepository extends JpaRepository<Pet,Long> {
 
     List<Pet> findPetByOwner_Id(Integer id);
+    List<Pet> findByOwner(Owner owner);
     Pet findPetByNameAndOwner(String name, Owner owner);
     boolean existsByNameAndOwner(String name, Owner owner);
 
