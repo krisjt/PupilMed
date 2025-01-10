@@ -36,7 +36,8 @@ public class RecommendationService {
     }
 
     public ResponseEntity<String> modifyRecommendation(VetRecommendationRequest payload) {
-        System.out.println("payload:" + payload);
+        if(payload.recommendation().length() < 5)
+            return new ResponseEntity<>("Recommendation is too short.", HttpStatus.BAD_REQUEST);
 
         Optional<Visit> visit = visitService.getVisitByID(payload.visitID());
         if(visit.isPresent() && visit.get().getRecommendation() != null){
@@ -66,7 +67,8 @@ public class RecommendationService {
     }
 
 public ResponseEntity<String> addRecommendation(VetRecommendationRequest payload) {
-    System.out.printf("payload:" + payload);
+    if(payload.recommendation().length() < 5)
+        return new ResponseEntity<>("Recommendation is too short.", HttpStatus.BAD_REQUEST);
 
     if (payload == null || payload.visitID() == null || payload.recommendation() == null) {
         return new ResponseEntity<>("Invalid payload: visitID or recommendation is missing.", HttpStatus.BAD_REQUEST);

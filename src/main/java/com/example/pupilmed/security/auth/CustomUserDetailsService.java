@@ -1,4 +1,4 @@
-package com.example.pupilmed.security.auth.service;
+package com.example.pupilmed.security.auth;
 
 import com.example.pupilmed.repositories.OwnerRepository;
 import com.example.pupilmed.repositories.VetRepository;

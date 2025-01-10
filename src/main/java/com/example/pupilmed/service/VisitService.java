@@ -75,6 +75,9 @@ public class VisitService{
     }
 
     public ResponseEntity<String> modifyVisit(VetVisitRequest payload) {
+            if(payload.visitType() == null || payload.date() == null || payload.hour() == null || payload.price() == null || payload.petName() == null) {
+                return new ResponseEntity<>("The fields are missing.", HttpStatus.BAD_REQUEST);
+            }
 
             Optional<Visit> dbV = getVisitByID(payload.id());
             if(dbV.isPresent()) {
@@ -85,7 +88,7 @@ public class VisitService{
 
                 if (validation.getStatusCode() == HttpStatus.OK) {
 
-                    Owner owner = ownerService.getOwnerByUsername(payload.phoneNumer());
+                    Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumer());
                     Pet pet = petService.getPetByNameAndOwner(payload.petName(), owner);
 
                     dbVisit.setDate(parseDate(payload.date()));
@@ -150,7 +153,7 @@ public class VisitService{
         ResponseEntity<String> validation = validateVisitData(vet,payload);
 
         if((validation.hasBody() && validation.getBody().equals("Visit does not exist."))||validation.getStatusCode()==HttpStatus.OK){
-            Owner owner = ownerService.getOwnerByUsername(payload.phoneNumer());
+            Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumer());
             Pet pet = petService.getPetByNameAndOwner(payload.petName(),owner);
             Visit visit = new Visit(parseDate(payload.date()), parseTime(payload.hour()), payload.visitType(), payload.price(), vet, pet);
             visitRepository.save(visit);
@@ -160,13 +163,13 @@ public class VisitService{
     }
 
     private ResponseEntity<String> validateVisitData(Vet vet, VetVisitRequest payload) {
-        String phoneNumber = payload.phoneNumer();
+        String phoneNumber = payload.ownerPhoneNumer();
 
         if (!userService.existsByUsernameAndRole(phoneNumber, Role.OWNER)) {
             return new ResponseEntity<>("Owner does not exist.", HttpStatus.NOT_FOUND);
         }
         String petName = payload.petName();
-        Owner owner = ownerService.getOwnerByUsername(payload.phoneNumer());
+        Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumer());
 
         if (!petService.existsByNameAndUser(petName, owner))
             return new ResponseEntity<>("Pet is not related to the owner.", HttpStatus.BAD_REQUEST);
@@ -190,7 +193,7 @@ public class VisitService{
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
+    }///TODO teraz mozna dodac wizyte w terminie zajetym, gdy podajemy tez id
 
     private java.sql.Date parseDate(String date) {
         return java.sql.Date.valueOf(date);

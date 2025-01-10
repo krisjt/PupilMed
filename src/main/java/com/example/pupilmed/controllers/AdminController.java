@@ -1,6 +1,8 @@
 package com.example.pupilmed.controllers;
 
 import com.example.pupilmed.models.database.visit.Visit;
+import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
+import com.example.pupilmed.models.server.visit.VetVisitRequest;
 import com.example.pupilmed.security.jwt.JwtUtils;
 import com.example.pupilmed.service.OwnerService;
 import com.example.pupilmed.models.database.pet.Pet;
@@ -10,12 +12,15 @@ import com.example.pupilmed.models.database.vet.Vet;
 import com.example.pupilmed.service.VetService;
 import com.example.pupilmed.service.VisitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
@@ -39,16 +44,48 @@ public class AdminController {
         this.jwtUtils = jwtUtils;
     }
 
-//    @GetMapping("/visits")
-//    public Page<Visit> getVisits(@RequestParam("pageNumber") Integer pageNumber,
-//                                 @RequestParam("pageSize") Integer pageSize){
-//        if(pageSize != null && pageNumber != null) {
-//            Pageable pageable = PageRequest.of(pageNumber, pageSize);
-//            return visitService.getAllVisits(pageable);
-//        }
-//        return null;
-//    }
+    @PostMapping("/add-visit")
+    public ResponseEntity<String> addVisit(@RequestBody VetVisitRequest payload ){
 
+        if(payload.vetPhoneNumer() != null) {
+            String vetPhoneNumer = payload.vetPhoneNumer();
+
+            Vet vet = vetService.getVetByUsername(vetPhoneNumer);
+
+            if (vet != null)
+                return visitService.addVisit(vet, payload);
+
+            return new ResponseEntity<>("Vet doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
+    }
+    @PutMapping("/modify-visit")
+    public ResponseEntity<String> modifyVisit(@RequestBody VetVisitRequest payload) {
+        if(payload.vetPhoneNumer() == null)
+            return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
+        return visitService.modifyVisit(payload);
+    }
+
+    @PostMapping("/add-recommendation")
+    public ResponseEntity<String> addRecommendation(@RequestBody VetRecommendationRequest payload){
+        System.out.println("AhAHAHHA");
+        return recommendationService.addRecommendation(payload);
+    }
+
+    @DeleteMapping("/delete-recommendation")
+    public ResponseEntity<String> deleteRecommendation(@RequestParam Integer visitID){
+        return recommendationService.deleteRecommendation(visitID);
+    }
+
+    @PutMapping("/modify-recommendation")
+    public ResponseEntity<String> modifyRecommendation(@RequestBody VetRecommendationRequest recommendation){
+        return recommendationService.modifyRecommendation(recommendation);
+    }
+
+    @DeleteMapping("/delete-visit")
+    public ResponseEntity<String> deleteVisit(@RequestParam Integer visitID){
+        return visitService.deleteVisit(visitID);
+    }
     @GetMapping("/visits-all")
     public List<Visit> getAllVisits(){
         return visitService.getAllVisits();

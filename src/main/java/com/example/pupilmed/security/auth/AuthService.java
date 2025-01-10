@@ -1,4 +1,4 @@
-package com.example.pupilmed.security.auth.service;
+package com.example.pupilmed.security.auth;
 
 import com.example.pupilmed.models.server.AuthenticationResponse;
 import com.example.pupilmed.security.jwt.JwtUtils;

@@ -109,7 +109,6 @@ public class VetController {
     @PutMapping("/modify-recommendation")
     public ResponseEntity<String> modifyRecommendation(@RequestBody VetRecommendationRequest recommendation){
         return recommendationService.modifyRecommendation(recommendation);
-
     }
     @DeleteMapping("/delete-recommendation")
     public ResponseEntity<String> deleteRecommendation(@RequestParam Integer visitID){
@@ -123,11 +122,7 @@ public class VetController {
 
     @PostMapping("/add-visit")
     public ResponseEntity<String> addVisit(@RequestBody VetVisitRequest payload, @RequestHeader("Authorization") String authHeader){
-        System.out.println();
-        System.out.println();
-        System.out.println(payload);
-        System.out.println();
-        System.out.println();
+
         String username = getUsernameFromToken(authHeader);
 
         User user = userService.getUserByUsername(username);
