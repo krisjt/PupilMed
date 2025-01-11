@@ -62,29 +62,10 @@ public class RecommendationService {
         Owner owner = ownerService.getOwnerByUsername(username);
         if(owner == null)return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NOT_FOUND);
 
-        System.out.println();
-        System.out.println();
-        System.out.println(owner);
-        System.out.println();
-        System.out.println();
-
         Optional<Pet> pet = petService.getPetByID(id);
         if(pet.isEmpty())return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NOT_FOUND);
 
-        System.out.println();
-        System.out.println();
-        System.out.println(pet);
-        System.out.println();
-        System.out.println();
-
         List<Visit> visits = visitService.getVisitsByPetIDAndOwner(id,owner);
-
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println(visits);
-        System.out.println();
-        System.out.println();
 
         if(visits.isEmpty()){
             return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NOT_FOUND);

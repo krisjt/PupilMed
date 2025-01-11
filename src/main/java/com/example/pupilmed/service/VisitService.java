@@ -194,7 +194,7 @@ public class VisitService{
             Vet vet = visit.getVet();
             Owner owner = pet.getOwnerID();
             User ownerUser = owner.getUser();
-            User vetUser = owner.getUser();
+            User vetUser = vet.getUser();
             return new VetVisitDetails(visit.getDate(), visit.getHour(), visit.getVisitType(), owner.getName(),
                     owner.getSurname(), vet.getName(), vet.getSurname(), ownerUser.getUsername(),
                     vetUser.getUsername(), visit.getPrice(), pet.getName(), pet.getBreed(), pet.getSpecies(), pet.getAge(), visit.getRecommendation());
