@@ -27,6 +27,8 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailService;
     private final AuthTokenFilter authTokenFilter;
 
+    private final String roleAdmin = "ADMIN";
+
     @Autowired
     AuthEntryPointJwt unauthorizedHandler;
 
@@ -49,9 +51,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         req -> req.requestMatchers("/login/**", "/logout/**").permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/owner/**").hasRole("OWNER")
-                                .requestMatchers("/vet/**").hasRole("VET")
+                                .requestMatchers("/admin/**").hasRole(roleAdmin)
+                                .requestMatchers("/owner/**").hasAnyRole("OWNER",roleAdmin)
+                                .requestMatchers("/vet/**").hasAnyRole("VET",roleAdmin)
                                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailService)

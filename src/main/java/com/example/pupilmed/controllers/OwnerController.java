@@ -4,6 +4,7 @@ import com.example.pupilmed.models.database.Pet;
 import com.example.pupilmed.models.database.Visit;
 import com.example.pupilmed.models.database.VisitType;
 import com.example.pupilmed.models.server.OwnerResponse;
+import com.example.pupilmed.models.server.RecommendationResponse;
 import com.example.pupilmed.models.server.VetVisitDetails;
 import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import com.example.pupilmed.service.*;
@@ -61,7 +62,7 @@ public class OwnerController {
     }
 
     @GetMapping("/recommendations")
-    public ResponseEntity<List<Recommendation>> getRecommendations(@RequestHeader("Authorization") String authHeader,@RequestParam("petID") int id){
+    public ResponseEntity<List<RecommendationResponse>> getRecommendations(@RequestHeader("Authorization") String authHeader, @RequestParam("petID") int id){
         return recommendationService.getRecommendationsByPetIDAndOwner(id,authHeader);
     }
 

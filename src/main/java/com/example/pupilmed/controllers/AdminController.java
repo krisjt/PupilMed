@@ -1,12 +1,8 @@
 package com.example.pupilmed.controllers;
 
-import com.example.pupilmed.models.database.Recommendation;
 import com.example.pupilmed.models.database.Visit;
 import com.example.pupilmed.models.database.VisitType;
-import com.example.pupilmed.models.server.PetRequest;
-import com.example.pupilmed.models.server.VetRecommendationRequest;
-import com.example.pupilmed.models.server.VetVisitDetails;
-import com.example.pupilmed.models.server.VetVisitRequest;
+import com.example.pupilmed.models.server.*;
 import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import com.example.pupilmed.service.*;
 import com.example.pupilmed.models.database.Pet;
@@ -107,7 +103,6 @@ public class AdminController {
     // RECOMMENDATIONS
     @PostMapping("/add-recommendation")
     public ResponseEntity<String> addRecommendation(@RequestBody VetRecommendationRequest payload){
-        System.out.println("AhAHAHHA");
         return recommendationService.addRecommendation(payload);
     }
 
@@ -121,16 +116,16 @@ public class AdminController {
         return recommendationService.modifyRecommendation(recommendation);
     }
 
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<RecommendationResponse>> getRecommendations(@RequestParam("petID") Integer petID){
+        return recommendationService.getRecommendationsByPetID(petID);
+    }
+
 
     //PETS
     @GetMapping("/get-pets")
     public List<Pet> getPets(){
         return petService.getPets();
-    }
-
-    @GetMapping("/recommendations")
-    public ResponseEntity<List<Recommendation>> getRecommendations(@RequestParam("petID") Integer petID){
-        return recommendationService.getRecommendationsByPetID(petID);
     }
 
     @PostMapping("/add-pet")
@@ -148,30 +143,5 @@ public class AdminController {
         return petService.deletePetById(petID);
     }
 
-    //NIE SPRAWDZONE STARE EP
-    @PostMapping("/add-vet")
-    public void addVet(@RequestBody Vet vet){
-        vetService.addVet(vet);
-    }
-
-    @DeleteMapping(path = "/delete-vet:{vetId}")
-    public void deleteVet(@PathVariable("vetId") int id){
-        vetService.deleteVet(id);
-    }
-
-    @PutMapping(path = "/update-vet:{vetId}")
-    public void updateVet(@RequestBody Vet vet, @PathVariable("vetId") int id){
-        vetService.updateVet(id, vet);
-    }
-
-    @GetMapping(path = "/get-visit-types")
-    public List<VisitType> getVisitTypes(){
-        return visitTypeService.getAll();
-    }
-
-    @GetMapping(path = "/get-species-breed")
-    public Map<String,List<String>> getSpeciesBreed(){
-        return speciesBreedService.getAll();
-    }
 }
 

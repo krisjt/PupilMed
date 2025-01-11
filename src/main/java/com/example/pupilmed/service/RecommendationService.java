@@ -4,6 +4,7 @@ import com.example.pupilmed.models.database.Owner;
 import com.example.pupilmed.models.database.Pet;
 import com.example.pupilmed.models.database.Recommendation;
 import com.example.pupilmed.models.database.Visit;
+import com.example.pupilmed.models.server.RecommendationResponse;
 import com.example.pupilmed.repositories.RecommendationRepository;
 import com.example.pupilmed.models.server.VetRecommendationRequest;
 import com.example.pupilmed.security.auth.jwt.JwtUtils;
@@ -34,7 +35,7 @@ public class RecommendationService {
         this.jwtUtils = jwtUtils;
     }
 
-    public ResponseEntity<List<Recommendation>> getRecommendationsByPetID(int id) {
+    public ResponseEntity<List<RecommendationResponse>> getRecommendationsByPetID(int id) {
 
         Optional<Pet> pet = petService.getPetByID(id);
         if(pet.isEmpty())return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
@@ -45,30 +46,55 @@ public class RecommendationService {
             return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
         }
 
-        List<Recommendation> recommendations = new ArrayList<>();
+        List<RecommendationResponse> recommendations = new ArrayList<>();
         for (Visit visit : visits) {
-            recommendations.add(visit.getRecommendation());
+            if(visit.getRecommendation() == null)continue;
+            recommendations.add(new RecommendationResponse(visit.getRecommendation().getId(),
+                    visit.getRecommendation().getRecommendation(),visit.getDate(),visit.getHour()));
         }
 
         return new ResponseEntity<>(recommendations,HttpStatus.OK);
-    }    public ResponseEntity<List<Recommendation>> getRecommendationsByPetIDAndOwner(int id, String authHeader) {
+    }
+
+    public ResponseEntity<List<RecommendationResponse>> getRecommendationsByPetIDAndOwner(int id, String authHeader) {
 
         String username = jwtUtils.getUsernameFromHeader(authHeader);
         Owner owner = ownerService.getOwnerByUsername(username);
-        if(owner==null)return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        if(owner == null)return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NOT_FOUND);
+
+        System.out.println();
+        System.out.println();
+        System.out.println(owner);
+        System.out.println();
+        System.out.println();
 
         Optional<Pet> pet = petService.getPetByID(id);
-        if(pet.isEmpty())return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        if(pet.isEmpty())return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NOT_FOUND);
+
+        System.out.println();
+        System.out.println();
+        System.out.println(pet);
+        System.out.println();
+        System.out.println();
 
         List<Visit> visits = visitService.getVisitsByPetIDAndOwner(id,owner);
 
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println(visits);
+        System.out.println();
+        System.out.println();
+
         if(visits.isEmpty()){
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NOT_FOUND);
         }
 
-        List<Recommendation> recommendations = new ArrayList<>();
+        List<RecommendationResponse> recommendations = new ArrayList<>();
         for (Visit visit : visits) {
-            recommendations.add(visit.getRecommendation());
+            if(visit.getRecommendation() == null)continue;
+            recommendations.add(new RecommendationResponse(visit.getRecommendation().getId(),
+                    visit.getRecommendation().getRecommendation(),visit.getDate(),visit.getHour()));
         }
 
         return new ResponseEntity<>(recommendations,HttpStatus.OK);
