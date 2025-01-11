@@ -11,7 +11,7 @@ import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +22,14 @@ public class OwnerService {
 
     private OwnerRepository ownerRepository;
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder bCryptPasswordEncoder;
     private JwtUtils jwtUtils;
 
     @Autowired
-    public OwnerService(OwnerRepository userRepository, UserRepository userRepository1, JwtUtils jwtUtils) {
+    public OwnerService(OwnerRepository userRepository, UserRepository userRepository1, PasswordEncoder bCryptPasswordEncoder, JwtUtils jwtUtils) {
         this.ownerRepository = userRepository;
         this.userRepository = userRepository1;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtils = jwtUtils;
     }
     public List<Owner> findAll(){return ownerRepository.findAll();}

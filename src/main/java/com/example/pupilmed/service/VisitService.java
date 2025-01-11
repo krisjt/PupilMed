@@ -42,10 +42,6 @@ public class VisitService{
         this.jwtUtils = jwtUtils;
     }
 
-//    public Page<Visit> getAllVisits(Pageable pageable){
-//        return visitRepository.getAllVisits(pageable);
-//    }
-
     public List<Visit> getAllVisits(){
         return visitRepository.findAll();
     }
@@ -66,16 +62,6 @@ public class VisitService{
     public boolean existsByDateAndVetAndHour(Date date, Vet vet, Time hour){return visitRepository.existsByDateAndVetAndHour(date,vet,hour);}
     public List<Visit> getExistingByDateAndVetAndHour(Date date, Vet vet, Time hour){return visitRepository.getVisitsByVetAndDateAndHour(vet,date,hour);}
     public Optional<Visit> getVisitByIDAndOwner(int id,Owner owner){return visitRepository.getVisitByIdAndPet_Owner(id,owner);}
-
-//    public List<Visit> getVisitsByUsername(String username) {
-//        User user = userService.getUserByUsername(username);
-//        if(user != null){
-//            Vet vet = vetService.getVetByUser(user);
-//
-//            return visitRepository.getVisitsByVet_Id(vet.getId());
-//        }
-//        return new ArrayList<>();
-//    }
 
     public ResponseEntity<String> modifyVisit(VetVisitRequest payload) {
             if(payload.visitType() == null || payload.date() == null || payload.hour() == null || payload.price() == null || payload.petName() == null) {

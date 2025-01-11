@@ -29,12 +29,11 @@ public class AuthService {
     public AuthenticationResponse authenticate(User requestUser){
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(requestUser.getUsername(), requestUser.getPassword()));
-
         User user = repository.findByUsername(requestUser.getUsername()).orElseThrow();
 
         String token = jwtUtils.generateToken(user);
         Role role = user.getRole();
 
-        return  new AuthenticationResponse(token, role);
+        return new AuthenticationResponse(token, role);
     }
 }

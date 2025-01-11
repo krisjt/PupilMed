@@ -70,7 +70,6 @@ public class AdminController {
 
     @PutMapping("/modify-visit")
     public ResponseEntity<String> modifyVisit(@RequestBody VetVisitRequest payload) {
-        System.out.println("payload:" + payload);
         if(payload.vetPhoneNumber() == null)
             return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
         return visitService.modifyVisit(payload);

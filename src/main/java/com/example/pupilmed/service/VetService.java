@@ -1,6 +1,5 @@
 package com.example.pupilmed.service;
 
-import com.example.pupilmed.models.database.Owner;
 import com.example.pupilmed.models.database.Role;
 import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.models.database.Vet;
@@ -10,7 +9,7 @@ import com.example.pupilmed.repositories.VetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,12 +20,13 @@ public class VetService {
 
     private final VetRepository vetRepository;
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public VetService(VetRepository vetRepository, UserRepository userRepository) {
+    public VetService(VetRepository vetRepository, UserRepository userRepository, PasswordEncoder bCryptPasswordEncoder) {
         this.vetRepository = vetRepository;
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public List<Vet> getVets(){
@@ -38,13 +38,6 @@ public class VetService {
     public Vet getVetByUsername(String user){
         return vetRepository.getVetByUser_Username(user);
     }
-//    public void addVet(Vet vet) {
-//        Optional<Vet> vetByAddress = vetRepository.findVetByClinicAddress(vet.getClinicAddress());
-//        if(vetByAddress.isPresent()){
-//            throw new IllegalStateException("address taken");
-//        }
-//        vetRepository.save(vet);
-//    }
 
     public void deleteVet(int id) {
         boolean exists = vetRepository.existsById(id);
