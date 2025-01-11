@@ -8,6 +8,7 @@ import lombok.Builder;
 @Builder
 public class Owner {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name="imie")
     private String name;

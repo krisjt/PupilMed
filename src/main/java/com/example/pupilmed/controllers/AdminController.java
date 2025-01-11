@@ -24,7 +24,7 @@ public class AdminController {
     private final VetService vetService;
     private final PetService petService;
     private final SpeciesBreedService speciesBreedService;
-
+    private final UserService userService;
     private final VisitTypeService visitTypeService;
     private final OwnerService ownerService;
     private final RecommendationService recommendationService;
@@ -33,10 +33,11 @@ public class AdminController {
 
     @Autowired
     public AdminController(VetService vetService, PetService petService,
-                           SpeciesBreedService speciesBreedService, VisitTypeService visitTypeService, OwnerService ownerService, RecommendationService recommendationService,
+                           SpeciesBreedService speciesBreedService, UserService userService, VisitTypeService visitTypeService, OwnerService ownerService, RecommendationService recommendationService,
                            VisitService visitService, JwtUtils jwtUtils) {
         this.vetService = vetService;
         this.speciesBreedService = speciesBreedService;
+        this.userService = userService;
         this.visitTypeService = visitTypeService;
         this.visitService = visitService;
         this.petService = petService;
@@ -143,6 +144,26 @@ public class AdminController {
         return petService.deletePetById(petID);
     }
 
+
+    @GetMapping("/get-users")
+    public List<UserResponse> getUsers(){
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/add-user")
+    public ResponseEntity<String> addUser(@RequestBody UserRequest payload){
+        return userService.addUser(payload);
+    }
+
+    @PutMapping("/modify-user")
+    public ResponseEntity<String> modifyUser(@RequestBody UserRequest payload, @RequestParam("userID") Integer userID){
+        return userService.modifyUser(payload, userID);
+    }
+
+    @DeleteMapping("/delete-user")
+    public ResponseEntity<String> deleteUser(@RequestParam("userID") Integer userID){
+        return userService.deleteUser(userID);
+    }
 
     //POMOCNICZE
     @GetMapping(path = "/get-visit-types")

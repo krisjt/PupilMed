@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PupilmedApplication {
 
+
     public static void main(String[] args) {
         SpringApplication.run(PupilmedApplication.class, args);
     }

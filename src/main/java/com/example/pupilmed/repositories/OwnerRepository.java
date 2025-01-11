@@ -11,5 +11,4 @@ public interface OwnerRepository extends JpaRepository<Owner,Integer> {
     Owner findOwnerByUser(User user);
     Owner findOwnerByUser_Username(String username);
     boolean existsByUser(User user);
-    Owner getOwnerByUser(User user);
 }

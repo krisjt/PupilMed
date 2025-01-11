@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "Weterynarz")
 public class Vet {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name="imie")
     private String name;

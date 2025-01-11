@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class User implements UserDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name="numer_telefonu", length = 9)
     private String username;
