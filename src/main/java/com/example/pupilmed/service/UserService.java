@@ -53,11 +53,11 @@ public class UserService {
         List<UserResponse> response = new ArrayList<>();
 
         for(Owner owner : owners){
-            response.add(new UserResponse(owner.getId(),Role.OWNER,owner.getName(),owner.getSurname(),owner.getUser().getUsername(), null,null));
+            response.add(new UserResponse(owner.getUser().getId(),Role.OWNER,owner.getName(),owner.getSurname(),owner.getUser().getUsername(), null,null));
         }
 
         for(Vet vet : vets){
-            response.add(new UserResponse(vet.getId(),Role.VET,vet.getName(),vet.getSurname(),vet.getUser().getUsername(), vet.getClinicAddress(), vet.getClinicName()));
+            response.add(new UserResponse(vet.getUser().getId(),Role.VET,vet.getName(),vet.getSurname(),vet.getUser().getUsername(), vet.getClinicAddress(), vet.getClinicName()));
         }
 
         return response;
