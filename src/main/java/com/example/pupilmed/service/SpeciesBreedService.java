@@ -1,6 +1,6 @@
 package com.example.pupilmed.service;
 
-import com.example.pupilmed.models.database.speciesBreed.SpeciesBreed;
+import com.example.pupilmed.models.database.SpeciesBreed;
 import com.example.pupilmed.repositories.SpeciesBreedRepository;
 import org.springframework.stereotype.Service;
 

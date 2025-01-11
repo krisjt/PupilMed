@@ -1,4 +1,4 @@
-package com.example.pupilmed.security.jwt;
+package com.example.pupilmed.security.auth.jwt;
 
 import com.example.pupilmed.security.auth.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;

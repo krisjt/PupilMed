@@ -1,12 +1,12 @@
 package com.example.pupilmed.service;
 
-import com.example.pupilmed.models.database.owner.Owner;
-import com.example.pupilmed.models.database.pet.Pet;
-import com.example.pupilmed.models.database.recommendation.Recommendation;
-import com.example.pupilmed.models.database.visit.Visit;
+import com.example.pupilmed.models.database.Owner;
+import com.example.pupilmed.models.database.Pet;
+import com.example.pupilmed.models.database.Recommendation;
+import com.example.pupilmed.models.database.Visit;
 import com.example.pupilmed.repositories.RecommendationRepository;
-import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
-import com.example.pupilmed.security.jwt.JwtUtils;
+import com.example.pupilmed.models.server.VetRecommendationRequest;
+import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,25 @@ public class RecommendationService {
         this.petService = petService;
         this.jwtUtils = jwtUtils;
     }
-    public ResponseEntity<List<Recommendation>> getRecommendationsByPetIDAndOwner(int id, String authHeader) {
+
+    public ResponseEntity<List<Recommendation>> getRecommendationsByPetID(int id) {
+
+        Optional<Pet> pet = petService.getPetByID(id);
+        if(pet.isEmpty())return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+
+        List<Visit> visits = visitService.getVisitsByPetID(id);
+
+        if(visits.isEmpty()){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        for (Visit visit : visits) {
+            recommendations.add(visit.getRecommendation());
+        }
+
+        return new ResponseEntity<>(recommendations,HttpStatus.OK);
+    }    public ResponseEntity<List<Recommendation>> getRecommendationsByPetIDAndOwner(int id, String authHeader) {
 
         String username = jwtUtils.getUsernameFromHeader(authHeader);
         Owner owner = ownerService.getOwnerByUsername(username);
@@ -79,7 +97,7 @@ public class RecommendationService {
             if(recommendation != null){
                 visit.get().setRecommendation(null);
                 visitService.save(visit.get());
-                recommendationRepository.deleteById((long)recommendation.getId());
+                recommendationRepository.deleteById(recommendation.getId());
                 return new ResponseEntity<>("Recommendation deleted successfully.", HttpStatus.OK);
             }
             return new ResponseEntity<>("Recommendation does not exist.", HttpStatus.NOT_FOUND);

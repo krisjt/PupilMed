@@ -1,6 +1,6 @@
 package com.example.pupilmed.models.server;
 
-import com.example.pupilmed.models.database.user.Role;
+import com.example.pupilmed.models.database.Role;
 
 public class AuthenticationResponse {
     private String token;

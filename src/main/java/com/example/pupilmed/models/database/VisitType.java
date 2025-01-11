@@ -1,4 +1,4 @@
-package com.example.pupilmed.models.database.visitType;
+package com.example.pupilmed.models.database;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

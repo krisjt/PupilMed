@@ -1,6 +1,6 @@
-package com.example.pupilmed.models.server.visit;
+package com.example.pupilmed.models.server;
 
-import com.example.pupilmed.models.database.recommendation.Recommendation;
+import com.example.pupilmed.models.database.Recommendation;
 
 import java.util.Date;
 

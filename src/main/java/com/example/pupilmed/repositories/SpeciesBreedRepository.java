@@ -1,7 +1,6 @@
 package com.example.pupilmed.repositories;
 
-import com.example.pupilmed.models.database.recommendation.Recommendation;
-import com.example.pupilmed.models.database.speciesBreed.SpeciesBreed;
+import com.example.pupilmed.models.database.SpeciesBreed;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

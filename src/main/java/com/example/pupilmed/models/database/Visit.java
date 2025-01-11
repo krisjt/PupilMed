@@ -1,8 +1,5 @@
-package com.example.pupilmed.models.database.visit;
+package com.example.pupilmed.models.database;
 
-import com.example.pupilmed.models.database.pet.Pet;
-import com.example.pupilmed.models.database.recommendation.Recommendation;
-import com.example.pupilmed.models.database.vet.Vet;
 import jakarta.persistence.*;
 import lombok.Builder;
 

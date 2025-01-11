@@ -1,6 +1,5 @@
-package com.example.pupilmed.models.database.pet;
+package com.example.pupilmed.models.database;
 
-import com.example.pupilmed.models.database.owner.Owner;
 import jakarta.persistence.*;
 import lombok.Builder;
 import java.sql.Date;
@@ -11,13 +10,14 @@ import java.util.Calendar;
 @Builder
 public class Pet {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name="imie", length = 100)
     private String name;
     @Column(name="gatunek", length = 100)
-    private String kind;
+    private String species;
     @Column(name="rasa")
-    private String type;
+    private String breed;
 
     @Column(name="data_urodzenia")
     private Date dateOfBirth;
@@ -45,27 +45,27 @@ public class Pet {
         this.name = name;
     }
 
-    public String getKind() {
-        return kind;
+    public String getSpecies() {
+        return species;
     }
 
-    public void setKind(String kind) {
-        this.kind = kind;
+    public void setSpecies(String kind) {
+        this.species = kind;
     }
 
-    public String getType() {
-        return type;
+    public String getBreed() {
+        return breed;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setBreed(String type) {
+        this.breed = type;
     }
 
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDate_of_birth(Date dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -99,31 +99,39 @@ public class Pet {
         return "Pet{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", kind='" + kind + '\'' +
-                ", type='" + type + '\'' +
+                ", kind='" + species + '\'' +
+                ", type='" + breed + '\'' +
                 ", date_of_birth='" + dateOfBirth + '\'' +
                 ", additional_info='" + additionalInfo + '\'' +
                 ", ownerID='" + owner + '\'' +
                 '}';
     }
 
-    public Pet(String name, String kind, String type, Date date_of_birth, String additional_info, Owner owner) {
+    public Pet(String name, String species, String breed, Date date_of_birth, String additional_info, Owner owner) {
         this.name = name;
-        this.kind = kind;
-        this.type = type;
+        this.species = species;
+        this.breed = breed;
         this.dateOfBirth = date_of_birth;
         this.additionalInfo = additional_info;
         this.owner = owner;
     }
 
-    public Pet(int id, String name, String kind, String type, Date date_of_birth, String additional_info, Owner ownerID) {
+    public Pet(String name, String species, String breed, Date date_of_birth, Owner ownerID) {
+        this.name = name;
+        this.species = species;
+        this.breed = breed;
+        this.dateOfBirth = date_of_birth;
+        this.owner = ownerID;
+    }
+
+    public Pet(int id, String name, String species, String breed, Date dateOfBirth, String additionalInfo, Owner owner) {
         this.id = id;
         this.name = name;
-        this.kind = kind;
-        this.type = type;
-        this.dateOfBirth = date_of_birth;
-        this.additionalInfo = additional_info;
-        this.owner = ownerID;
+        this.species = species;
+        this.breed = breed;
+        this.dateOfBirth = dateOfBirth;
+        this.additionalInfo = additionalInfo;
+        this.owner = owner;
     }
 
     public Pet() {

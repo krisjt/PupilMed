@@ -1,10 +1,10 @@
 package com.example.pupilmed.service;
 
-import com.example.pupilmed.models.database.owner.Owner;
-import com.example.pupilmed.models.database.user.User;
+import com.example.pupilmed.models.database.Owner;
+import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.models.server.OwnerResponse;
 import com.example.pupilmed.repositories.OwnerRepository;
-import com.example.pupilmed.security.jwt.JwtUtils;
+import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,7 +2,7 @@ package com.example.pupilmed.security.auth;
 
 import com.example.pupilmed.repositories.OwnerRepository;
 import com.example.pupilmed.repositories.VetRepository;
-import com.example.pupilmed.models.database.user.User;
+import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DisabledException;

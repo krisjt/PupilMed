@@ -1,15 +1,15 @@
 package com.example.pupilmed.service;
 
-        import com.example.pupilmed.models.database.owner.Owner;
-        import com.example.pupilmed.models.database.pet.Pet;
-        import com.example.pupilmed.models.database.user.Role;
-        import com.example.pupilmed.models.database.user.User;
-        import com.example.pupilmed.models.database.vet.Vet;
-        import com.example.pupilmed.models.database.visit.Visit;
+        import com.example.pupilmed.models.database.Owner;
+        import com.example.pupilmed.models.database.Pet;
+        import com.example.pupilmed.models.database.Role;
+        import com.example.pupilmed.models.database.User;
+        import com.example.pupilmed.models.database.Vet;
+        import com.example.pupilmed.models.database.Visit;
         import com.example.pupilmed.repositories.VisitRepository;
-        import com.example.pupilmed.models.server.visit.VetVisitDetails;
-        import com.example.pupilmed.models.server.visit.VetVisitRequest;
-        import com.example.pupilmed.security.jwt.JwtUtils;
+        import com.example.pupilmed.models.server.VetVisitDetails;
+        import com.example.pupilmed.models.server.VetVisitRequest;
+        import com.example.pupilmed.security.auth.jwt.JwtUtils;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.HttpStatus;
         import org.springframework.http.ResponseEntity;
@@ -17,7 +17,6 @@ package com.example.pupilmed.service;
 
         import java.sql.Time;
         import java.text.ParseException;
-        import java.text.SimpleDateFormat;
         import java.util.ArrayList;
         import java.util.Date;
         import java.util.List;
@@ -56,14 +55,14 @@ public class VisitService{
     public List<Visit> getVisitsByVetID(int id) {
         return visitRepository.getVisitsByVet_Id(id);
     }
-
+    public List<Visit> getVisitsByPetID(Integer petID){return visitRepository.getVisitsByPet_Id(petID);}
     public void save(Visit visit) {
         visitRepository.save(visit);
     }
     public Optional<Visit> getVisitByID(int id) {
         return visitRepository.getVisitById(id);
     }
-    public boolean existsByID(int id){return visitRepository.existsById((long)id);}
+    public boolean existsByID(int id){return visitRepository.existsById(id);}
     public boolean existsByDateAndVetAndHour(Date date, Vet vet, Time hour){return visitRepository.existsByDateAndVetAndHour(date,vet,hour);}
     public List<Visit> getExistingByDateAndVetAndHour(Date date, Vet vet, Time hour){return visitRepository.getVisitsByVetAndDateAndHour(vet,date,hour);}
     public Optional<Visit> getVisitByIDAndOwner(int id,Owner owner){return visitRepository.getVisitByIdAndPet_Owner(id,owner);}
@@ -112,7 +111,7 @@ public class VisitService{
 
     public ResponseEntity<String> deleteVisit(Integer visitID){
         if(existsByID(visitID)){
-            visitRepository.deleteById((long)visitID);
+            visitRepository.deleteById(visitID);
             return new ResponseEntity<>("Visit deleted successfully.", HttpStatus.OK);
         }
         return new ResponseEntity<>("Visit does not exist.", HttpStatus.NOT_FOUND);
@@ -198,7 +197,7 @@ public class VisitService{
             User vetUser = owner.getUser();
             return new VetVisitDetails(visit.getDate(), visit.getHour(), visit.getVisitType(), owner.getName(),
                     owner.getSurname(), vet.getName(), vet.getSurname(), ownerUser.getUsername(),
-                    vetUser.getUsername(), visit.getPrice(), pet.getName(), pet.getType(), pet.getKind(), pet.getAge(), visit.getRecommendation());
+                    vetUser.getUsername(), visit.getPrice(), pet.getName(), pet.getBreed(), pet.getSpecies(), pet.getAge(), visit.getRecommendation());
         }
         return null;
     }

@@ -1,15 +1,15 @@
 package com.example.pupilmed.controllers;
 
-import com.example.pupilmed.models.database.pet.Pet;
-import com.example.pupilmed.models.database.user.User;
-import com.example.pupilmed.models.database.vet.Vet;
-import com.example.pupilmed.models.database.visit.Visit;
-import com.example.pupilmed.models.database.visitType.VisitType;
+import com.example.pupilmed.models.database.Pet;
+import com.example.pupilmed.models.database.User;
+import com.example.pupilmed.models.database.Vet;
+import com.example.pupilmed.models.database.Visit;
+import com.example.pupilmed.models.database.VisitType;
 import com.example.pupilmed.models.server.VetResponse;
-import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
-import com.example.pupilmed.models.server.visit.VetVisitDetails;
-import com.example.pupilmed.models.server.visit.VetVisitRequest;
-import com.example.pupilmed.security.jwt.JwtUtils;
+import com.example.pupilmed.models.server.VetRecommendationRequest;
+import com.example.pupilmed.models.server.VetVisitDetails;
+import com.example.pupilmed.models.server.VetVisitRequest;
+import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import com.example.pupilmed.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

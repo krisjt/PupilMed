@@ -1,6 +1,6 @@
 package com.example.pupilmed.controllers;
 
-import com.example.pupilmed.models.database.user.User;
+import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.models.server.AuthenticationResponse;
 import com.example.pupilmed.security.auth.AuthService;
 import org.springframework.http.ResponseEntity;

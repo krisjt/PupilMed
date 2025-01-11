@@ -1,7 +1,7 @@
 package com.example.pupilmed.service;
 
-import com.example.pupilmed.models.database.user.User;
-import com.example.pupilmed.models.database.vet.Vet;
+import com.example.pupilmed.models.database.User;
+import com.example.pupilmed.models.database.Vet;
 import com.example.pupilmed.repositories.VetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,9 +37,9 @@ public class VetService {
     }
 
     public void deleteVet(int id) {
-        boolean exists = vetRepository.existsById((long)id);
+        boolean exists = vetRepository.existsById(id);
         if(exists){
-            vetRepository.deleteById((long)id);
+            vetRepository.deleteById(id);
         }
         else{
             throw new IllegalStateException("Vet with id = " + id + " does not exist.");
@@ -48,9 +48,9 @@ public class VetService {
 
     public void updateVet(int id, Vet vet) {
         if(id == vet.getId()){
-            Optional<Vet> oldVet = vetRepository.findById((long)id);
+            Optional<Vet> oldVet = vetRepository.findById(id);
             if(oldVet.isPresent() && oldVet.get().getUser()==vet.getUser()) {
-                boolean exists = vetRepository.existsById((long) id);
+                boolean exists = vetRepository.existsById(id);
                 if (exists) {
                     vetRepository.save(vet);
                 } else {

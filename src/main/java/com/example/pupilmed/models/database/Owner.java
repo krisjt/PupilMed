@@ -1,6 +1,5 @@
-package com.example.pupilmed.models.database.owner;
+package com.example.pupilmed.models.database;
 
-import com.example.pupilmed.models.database.user.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 

@@ -1,6 +1,6 @@
 package com.example.pupilmed.service;
 
-import com.example.pupilmed.models.database.visitType.VisitType;
+import com.example.pupilmed.models.database.VisitType;
 import com.example.pupilmed.repositories.VisitTypeRepository;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.example.pupilmed.models.database.recommendation;
+package com.example.pupilmed.models.database;
 
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -1,9 +1,9 @@
 package com.example.pupilmed.security.auth;
 
 import com.example.pupilmed.models.server.AuthenticationResponse;
-import com.example.pupilmed.security.jwt.JwtUtils;
-import com.example.pupilmed.models.database.user.Role;
-import com.example.pupilmed.models.database.user.User;
+import com.example.pupilmed.security.auth.jwt.JwtUtils;
+import com.example.pupilmed.models.database.Role;
+import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

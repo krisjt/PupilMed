@@ -1,7 +1,7 @@
 package com.example.pupilmed.security;
 
-import com.example.pupilmed.security.jwt.AuthEntryPointJwt;
-import com.example.pupilmed.security.jwt.AuthTokenFilter;
+import com.example.pupilmed.security.auth.jwt.AuthEntryPointJwt;
+import com.example.pupilmed.security.auth.jwt.AuthTokenFilter;
 import com.example.pupilmed.security.auth.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

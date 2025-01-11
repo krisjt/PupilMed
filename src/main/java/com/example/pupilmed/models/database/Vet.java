@@ -1,6 +1,5 @@
-package com.example.pupilmed.models.database.vet;
+package com.example.pupilmed.models.database;
 
-import com.example.pupilmed.models.database.user.User;
 import jakarta.persistence.*;
 
 @Entity

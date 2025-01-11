@@ -1,13 +1,13 @@
 package com.example.pupilmed.controllers;
 
-import com.example.pupilmed.models.database.pet.Pet;
-import com.example.pupilmed.models.database.visit.Visit;
-import com.example.pupilmed.models.database.visitType.VisitType;
+import com.example.pupilmed.models.database.Pet;
+import com.example.pupilmed.models.database.Visit;
+import com.example.pupilmed.models.database.VisitType;
 import com.example.pupilmed.models.server.OwnerResponse;
-import com.example.pupilmed.models.server.visit.VetVisitDetails;
-import com.example.pupilmed.security.jwt.JwtUtils;
+import com.example.pupilmed.models.server.VetVisitDetails;
+import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import com.example.pupilmed.service.*;
-import com.example.pupilmed.models.database.recommendation.Recommendation;
+import com.example.pupilmed.models.database.Recommendation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

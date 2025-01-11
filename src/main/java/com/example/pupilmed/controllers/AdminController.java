@@ -1,14 +1,16 @@
 package com.example.pupilmed.controllers;
 
-import com.example.pupilmed.models.database.visit.Visit;
-import com.example.pupilmed.models.database.visitType.VisitType;
-import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
-import com.example.pupilmed.models.server.visit.VetVisitDetails;
-import com.example.pupilmed.models.server.visit.VetVisitRequest;
-import com.example.pupilmed.security.jwt.JwtUtils;
+import com.example.pupilmed.models.database.Recommendation;
+import com.example.pupilmed.models.database.Visit;
+import com.example.pupilmed.models.database.VisitType;
+import com.example.pupilmed.models.server.PetRequest;
+import com.example.pupilmed.models.server.VetRecommendationRequest;
+import com.example.pupilmed.models.server.VetVisitDetails;
+import com.example.pupilmed.models.server.VetVisitRequest;
+import com.example.pupilmed.security.auth.jwt.JwtUtils;
 import com.example.pupilmed.service.*;
-import com.example.pupilmed.models.database.pet.Pet;
-import com.example.pupilmed.models.database.vet.Vet;
+import com.example.pupilmed.models.database.Pet;
+import com.example.pupilmed.models.database.Vet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,7 @@ public class AdminController {
         this.jwtUtils = jwtUtils;
     }
 
+    // VISITS
     @PostMapping("/add-visit")
     public ResponseEntity<String> addVisit(@RequestBody VetVisitRequest payload ){
 
@@ -76,22 +79,6 @@ public class AdminController {
         return visitService.modifyVisit(payload);
     }
 
-    @PostMapping("/add-recommendation")
-    public ResponseEntity<String> addRecommendation(@RequestBody VetRecommendationRequest payload){
-        System.out.println("AhAHAHHA");
-        return recommendationService.addRecommendation(payload);
-    }
-
-    @DeleteMapping("/delete-recommendation")
-    public ResponseEntity<String> deleteRecommendation(@RequestParam Integer visitID){
-        return recommendationService.deleteRecommendation(visitID);
-    }
-
-    @PutMapping("/modify-recommendation")
-    public ResponseEntity<String> modifyRecommendation(@RequestBody VetRecommendationRequest recommendation){
-        return recommendationService.modifyRecommendation(recommendation);
-    }
-
     @DeleteMapping("/delete-visit")
     public ResponseEntity<String> deleteVisit(@RequestParam Integer visitID){
         return visitService.deleteVisit(visitID);
@@ -117,6 +104,50 @@ public class AdminController {
         return visitService.getVisitSBetweenDates(startDate,endDate);
     }
 
+    // RECOMMENDATIONS
+    @PostMapping("/add-recommendation")
+    public ResponseEntity<String> addRecommendation(@RequestBody VetRecommendationRequest payload){
+        System.out.println("AhAHAHHA");
+        return recommendationService.addRecommendation(payload);
+    }
+
+    @DeleteMapping("/delete-recommendation")
+    public ResponseEntity<String> deleteRecommendation(@RequestParam Integer visitID){
+        return recommendationService.deleteRecommendation(visitID);
+    }
+
+    @PutMapping("/modify-recommendation")
+    public ResponseEntity<String> modifyRecommendation(@RequestBody VetRecommendationRequest recommendation){
+        return recommendationService.modifyRecommendation(recommendation);
+    }
+
+
+    //PETS
+    @GetMapping("/get-pets")
+    public List<Pet> getPets(){
+        return petService.getPets();
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<Recommendation>> getRecommendations(@RequestParam("petID") Integer petID){
+        return recommendationService.getRecommendationsByPetID(petID);
+    }
+
+    @PostMapping("/add-pet")
+    public ResponseEntity<String> addPet(@RequestBody PetRequest payload){
+        return petService.addPet(payload);
+    }
+
+    @PutMapping("/modify-pet")
+    public ResponseEntity<String> modifyPet(@RequestBody PetRequest payload, @RequestParam("petID") Integer petID){
+        return petService.modifyPet(petID,payload);
+    }
+
+    @DeleteMapping("/delete-pet")
+    public ResponseEntity<String> deletePet(@RequestParam("petID")Integer petID){
+        return petService.deletePetById(petID);
+    }
+
     //NIE SPRAWDZONE STARE EP
     @PostMapping("/add-vet")
     public void addVet(@RequestBody Vet vet){
@@ -127,10 +158,7 @@ public class AdminController {
     public void deleteVet(@PathVariable("vetId") int id){
         vetService.deleteVet(id);
     }
-    @GetMapping("/get-pets")
-    public List<Pet> getPets(){
-        return petService.getPets();
-    }
+
     @PutMapping(path = "/update-vet:{vetId}")
     public void updateVet(@RequestBody Vet vet, @PathVariable("vetId") int id){
         vetService.updateVet(id, vet);

@@ -1,9 +1,8 @@
 package com.example.pupilmed.repositories;
 
-import com.example.pupilmed.models.database.owner.Owner;
-import com.example.pupilmed.models.database.recommendation.Recommendation;
-import com.example.pupilmed.models.database.vet.Vet;
-import com.example.pupilmed.models.database.visit.Visit;
+import com.example.pupilmed.models.database.Owner;
+import com.example.pupilmed.models.database.Vet;
+import com.example.pupilmed.models.database.Visit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,11 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface VisitRepository extends JpaRepository<Visit,Long> {
+public interface VisitRepository extends JpaRepository<Visit,Integer> {
     public List<Visit> getVisitsByPet_IdAndPet_Owner(int id, Owner owner);
     public List<Visit> getVisitsByVet_Id(int id);
     List<Visit> getVisitByDateBetween(Date start, Date end);
     Optional<Visit> getVisitById(int id);
+    List<Visit> getVisitsByPet_Id(Integer petID);
     List<Visit> getVisitsByPet_Owner(Owner owner);
 //    OVisit> getVisitById(int id);
     boolean existsByDateAndVetAndHour(Date date, Vet vet, Time hour);

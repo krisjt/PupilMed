@@ -1,4 +1,4 @@
-package com.example.pupilmed.security.jwt;
+package com.example.pupilmed.security.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

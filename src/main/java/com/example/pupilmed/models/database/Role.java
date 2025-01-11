@@ -1,4 +1,4 @@
-package com.example.pupilmed.models.database.user;
+package com.example.pupilmed.models.database;
 
 public enum Role {
     OWNER,
