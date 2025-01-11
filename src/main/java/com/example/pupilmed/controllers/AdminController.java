@@ -143,5 +143,16 @@ public class AdminController {
         return petService.deletePetById(petID);
     }
 
+
+    //POMOCNICZE
+    @GetMapping(path = "/get-visit-types")
+    public List<VisitType> getVisitTypes(){
+        return visitTypeService.getAll();
+    }
+
+    @GetMapping(path = "/get-species-breed")
+    public Map<String,List<String>> getSpeciesBreed(){
+        return speciesBreedService.getAll();
+    }
 }
 
