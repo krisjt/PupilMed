@@ -16,6 +16,8 @@ package com.example.pupilmed.service;
         import org.springframework.stereotype.Service;
 
         import java.sql.Time;
+        import java.text.ParseException;
+        import java.text.SimpleDateFormat;
         import java.util.ArrayList;
         import java.util.Date;
         import java.util.List;
@@ -48,8 +50,8 @@ public class VisitService{
     public List<Visit> getAllVisits(){
         return visitRepository.findAll();
     }
-    public List<Visit> getVisitsByPetID(int id) {
-        return visitRepository.getVisitsByPet_Id(id);
+    public List<Visit> getVisitsByPetIDAndOwner(int id, Owner owner) {
+        return visitRepository.getVisitsByPet_IdAndPet_Owner(id,owner);
     }
     public List<Visit> getVisitsByVetID(int id) {
         return visitRepository.getVisitsByVet_Id(id);
@@ -64,15 +66,17 @@ public class VisitService{
     public boolean existsByID(int id){return visitRepository.existsById((long)id);}
     public boolean existsByDateAndVetAndHour(Date date, Vet vet, Time hour){return visitRepository.existsByDateAndVetAndHour(date,vet,hour);}
     public List<Visit> getExistingByDateAndVetAndHour(Date date, Vet vet, Time hour){return visitRepository.getVisitsByVetAndDateAndHour(vet,date,hour);}
-    public List<Visit> getVisitsByUsername(String username) {
-        User user = userService.getUserByUsername(username);
-        if(user != null){
-            Vet vet = vetService.getVetByUser(user);
+    public Optional<Visit> getVisitByIDAndOwner(int id,Owner owner){return visitRepository.getVisitByIdAndPet_Owner(id,owner);}
 
-            return visitRepository.getVisitsByVet_Id(vet.getId());
-        }
-        return new ArrayList<>();
-    }
+//    public List<Visit> getVisitsByUsername(String username) {
+//        User user = userService.getUserByUsername(username);
+//        if(user != null){
+//            Vet vet = vetService.getVetByUser(user);
+//
+//            return visitRepository.getVisitsByVet_Id(vet.getId());
+//        }
+//        return new ArrayList<>();
+//    }
 
     public ResponseEntity<String> modifyVisit(VetVisitRequest payload) {
             if(payload.visitType() == null || payload.date() == null || payload.hour() == null || payload.price() == null || payload.petName() == null) {
@@ -125,7 +129,24 @@ public class VisitService{
         return new ArrayList<>();
     }
 
-    public List<Visit> getVisitsByOwnerUsernameBetweenDates(String username, Date startDate, Date endDate) {
+    public List<Visit> getOwnerVisitsByUsername(String authHeader){
+        String username = jwtUtils.getUsernameFromHeader(authHeader);
+
+        Owner owner = ownerService.getOwnerByUsername(username);
+
+        if(owner != null){
+            return visitRepository.getVisitsByPet_Owner(owner);
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Visit> getVisitsByOwnerUsernameBetweenDates(String header, String startDate, String endDate) throws ParseException {
+
+        String username = jwtUtils.getUsernameFromHeader(header);
+
+        Date start = parseDate(startDate);
+        Date end = parseDate(endDate);
+
         User user = userService.getUserByUsername(username);
         if (user != null) {
             Owner owner = ownerService.getOwnerByUser(user);
@@ -134,7 +155,7 @@ public class VisitService{
 
                 List<Visit> visits = new ArrayList<>();
                 for (Pet pet : pets) {
-                    visits.addAll(visitRepository.getVisitsByPet_IdAndDateBetween(pet.getId(), startDate, endDate));
+                    visits.addAll(visitRepository.getVisitsByPet_IdAndDateBetween(pet.getId(), start, end));
                 }
                 return visits;
             }
@@ -148,8 +169,25 @@ public class VisitService{
         return null;
     }
 
-    public VetVisitDetails getVisitDetails(int visitID){
-        Optional<Visit> optVisit = getVisitByID(visitID);
+    public VetVisitDetails getVisitDetails(int visitID, String header){
+        String username = jwtUtils.getUsernameFromHeader(header);
+        User user = userService.getUserByUsername(username);
+        Optional<Visit> optVisit = Optional.empty();
+
+
+        if(user.getRole()==Role.ADMIN)
+            optVisit = getVisitByID(visitID);
+        if(user.getRole()==Role.VET) {
+            Vet vet = vetService.getVetByUsername(username);
+            if(vet == null)return null;
+            optVisit = visitRepository.getVisitsByIdAndVet(visitID,vet);
+        }
+        if(user.getRole()==Role.OWNER) {
+            Owner owner = ownerService.getOwnerByUsername(username);
+            if(owner == null)return null;
+            optVisit = getVisitByIDAndOwner(visitID,owner);
+        }
+
 
         if(optVisit.isPresent()) {
             Visit visit = optVisit.get();

@@ -35,6 +35,16 @@ public class JwtUtils {
         return null;
     }
 
+    public String getUsernameFromHeader(String header){
+        String token = header.replace("Bearer ", "");
+
+        if (!validateJwtToken(token)) {
+            throw new RuntimeException("Invalid or expired token");
+        }
+
+        return getUsernameFromJwtToken(token);
+    }
+
     public String generateToken(UserDetails userDetails){
         String username = userDetails.getUsername();
         return Jwts.builder()

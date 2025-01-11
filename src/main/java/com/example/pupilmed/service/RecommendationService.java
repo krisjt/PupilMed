@@ -1,9 +1,12 @@
 package com.example.pupilmed.service;
 
+import com.example.pupilmed.models.database.owner.Owner;
+import com.example.pupilmed.models.database.pet.Pet;
 import com.example.pupilmed.models.database.recommendation.Recommendation;
 import com.example.pupilmed.models.database.visit.Visit;
 import com.example.pupilmed.repositories.RecommendationRepository;
 import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
+import com.example.pupilmed.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +21,39 @@ public class RecommendationService {
 
     private RecommendationRepository recommendationRepository;
     private VisitService visitService;
+    private OwnerService ownerService;
+    private PetService petService;
+    private JwtUtils jwtUtils;
 
     @Autowired
-    public RecommendationService(RecommendationRepository recommendationRepository, VisitService visitService) {
+    public RecommendationService(RecommendationRepository recommendationRepository, VisitService visitService, OwnerService ownerService, PetService petService, JwtUtils jwtUtils) {
         this.recommendationRepository = recommendationRepository;
         this.visitService = visitService;
+        this.ownerService = ownerService;
+        this.petService = petService;
+        this.jwtUtils = jwtUtils;
     }
-    public List<Recommendation> getRecommendationsByPetID(int id) {
-        List<Visit> visits = visitService.getVisitsByPetID(id);
+    public ResponseEntity<List<Recommendation>> getRecommendationsByPetIDAndOwner(int id, String authHeader) {
+
+        String username = jwtUtils.getUsernameFromHeader(authHeader);
+        Owner owner = ownerService.getOwnerByUsername(username);
+        if(owner==null)return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+
+        Optional<Pet> pet = petService.getPetByID(id);
+        if(pet.isEmpty())return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+
+        List<Visit> visits = visitService.getVisitsByPetIDAndOwner(id,owner);
+
+        if(visits.isEmpty()){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
 
         List<Recommendation> recommendations = new ArrayList<>();
         for (Visit visit : visits) {
             recommendations.add(visit.getRecommendation());
         }
 
-        return  recommendations;
+        return new ResponseEntity<>(recommendations,HttpStatus.OK);
     }
 
     public ResponseEntity<String> modifyRecommendation(VetRecommendationRequest payload) {

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PetRepository extends JpaRepository<Pet,Long> {
@@ -14,5 +15,6 @@ public interface PetRepository extends JpaRepository<Pet,Long> {
     List<Pet> findByOwner(Owner owner);
     Pet findPetByNameAndOwner(String name, Owner owner);
     boolean existsByNameAndOwner(String name, Owner owner);
+    Optional<Pet> getPetById(Integer id);
 
 }

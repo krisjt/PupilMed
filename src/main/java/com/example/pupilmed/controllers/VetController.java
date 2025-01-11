@@ -4,6 +4,7 @@ import com.example.pupilmed.models.database.pet.Pet;
 import com.example.pupilmed.models.database.user.User;
 import com.example.pupilmed.models.database.vet.Vet;
 import com.example.pupilmed.models.database.visit.Visit;
+import com.example.pupilmed.models.database.visitType.VisitType;
 import com.example.pupilmed.models.server.VetResponse;
 import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
 import com.example.pupilmed.models.server.visit.VetVisitDetails;
@@ -19,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/vet")
@@ -29,16 +31,21 @@ public class VetController {
     private final PetService petService;
     private final OwnerService ownerService;
     private final UserService userService;
+    private final SpeciesBreedService speciesBreedService;
+
+    private final VisitTypeService visitTypeService;
     private final RecommendationService recommendationService;
     private final VisitService visitService;
     private final JwtUtils jwtUtils;
 
     @Autowired
     public VetController(VetService vetService, PetService petService,
-                         OwnerService ownerService, UserService userService, RecommendationService recommendationService,
+                         OwnerService ownerService, UserService userService, SpeciesBreedService speciesBreedService, VisitTypeService visitTypeService, RecommendationService recommendationService,
                          VisitService visitService, JwtUtils jwtUtils) {
         this.vetService = vetService;
         this.userService = userService;
+        this.speciesBreedService = speciesBreedService;
+        this.visitTypeService = visitTypeService;
         this.visitService = visitService;
         this.petService = petService;
         this.ownerService = ownerService;
@@ -51,23 +58,10 @@ public class VetController {
         return petService.getPets();
     }
 
-    @GetMapping("/visits")
-    public List<Visit> getVisits(@RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer ", "");
-
-        if (!jwtUtils.validateJwtToken(token)) {
-            throw new RuntimeException("Invalid or expired token");
-        }
-
-        String username = jwtUtils.getUsernameFromJwtToken(token);
-
-        return visitService.getVisitsByUsername(username);
-    }
-
     //TODO: dodac sprawdzanie czy wizyta nalezy do weterynarza, jak nie to nie zwracac
     @GetMapping("/visit-details")
-    public VetVisitDetails getVisitDetails(@RequestParam("visitID") Integer visitID){
-        return visitService.getVisitDetails(visitID);
+    public VetVisitDetails getVisitDetails(@RequestHeader("Authorization") String authHeader,@RequestParam("visitID") Integer visitID){
+        return visitService.getVisitDetails(visitID,authHeader);
     }
 
     @GetMapping("/visits-by-date")
@@ -143,6 +137,16 @@ public class VetController {
         }
 
         return jwtUtils.getUsernameFromJwtToken(token);
+    }
+
+    @GetMapping(path = "/get-visit-types")
+    public List<VisitType> getVisitTypes(){
+        return visitTypeService.getAll();
+    }
+
+    @GetMapping(path = "/get-species-breed")
+    public Map<String,List<String>> getSpeciesBreed(){
+        return speciesBreedService.getAll();
     }
 }
 

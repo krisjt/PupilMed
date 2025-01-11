@@ -1,17 +1,14 @@
 package com.example.pupilmed.controllers;
 
 import com.example.pupilmed.models.database.visit.Visit;
+import com.example.pupilmed.models.database.visitType.VisitType;
 import com.example.pupilmed.models.server.recommendation.VetRecommendationRequest;
 import com.example.pupilmed.models.server.visit.VetVisitDetails;
 import com.example.pupilmed.models.server.visit.VetVisitRequest;
 import com.example.pupilmed.security.jwt.JwtUtils;
-import com.example.pupilmed.service.OwnerService;
+import com.example.pupilmed.service.*;
 import com.example.pupilmed.models.database.pet.Pet;
-import com.example.pupilmed.service.PetService;
-import com.example.pupilmed.service.RecommendationService;
 import com.example.pupilmed.models.database.vet.Vet;
-import com.example.pupilmed.service.VetService;
-import com.example.pupilmed.service.VisitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +18,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
     private final VetService vetService;
     private final PetService petService;
+    private final SpeciesBreedService speciesBreedService;
+
+    private final VisitTypeService visitTypeService;
     private final OwnerService ownerService;
     private final RecommendationService recommendationService;
     private final VisitService visitService;
@@ -34,9 +35,11 @@ public class AdminController {
 
     @Autowired
     public AdminController(VetService vetService, PetService petService,
-                           OwnerService ownerService, RecommendationService recommendationService,
+                           SpeciesBreedService speciesBreedService, VisitTypeService visitTypeService, OwnerService ownerService, RecommendationService recommendationService,
                            VisitService visitService, JwtUtils jwtUtils) {
         this.vetService = vetService;
+        this.speciesBreedService = speciesBreedService;
+        this.visitTypeService = visitTypeService;
         this.visitService = visitService;
         this.petService = petService;
         this.ownerService = ownerService;
@@ -61,8 +64,8 @@ public class AdminController {
     }
 
     @GetMapping("/visit-details")
-    public VetVisitDetails getVisitDetails(@RequestParam("visitID") Integer visitID) {
-        return visitService.getVisitDetails(visitID);
+    public VetVisitDetails getVisitDetails(@RequestHeader("Authorization") String authHeader, @RequestParam("visitID") Integer visitID) {
+        return visitService.getVisitDetails(visitID,authHeader);
     }
 
     @PutMapping("/modify-visit")
@@ -107,8 +110,6 @@ public class AdminController {
             throw new RuntimeException("Invalid or expired token");
         }
 
-        String username = jwtUtils.getUsernameFromJwtToken(token);
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date startDate = dateFormat.parse(startDateStr);
         Date endDate = dateFormat.parse(endDateStr);
@@ -133,6 +134,16 @@ public class AdminController {
     @PutMapping(path = "/update-vet:{vetId}")
     public void updateVet(@RequestBody Vet vet, @PathVariable("vetId") int id){
         vetService.updateVet(id, vet);
+    }
+
+    @GetMapping(path = "/get-visit-types")
+    public List<VisitType> getVisitTypes(){
+        return visitTypeService.getAll();
+    }
+
+    @GetMapping(path = "/get-species-breed")
+    public Map<String,List<String>> getSpeciesBreed(){
+        return speciesBreedService.getAll();
     }
 }
 
