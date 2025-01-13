@@ -106,10 +106,19 @@ public class UserService {
 
         Optional<User> optUser = userRepository.findByUsername(username);
 
-
         if(optUser.isPresent()){
             User user = optUser.get();
-            if(!Objects.equals(user.getPassword(), oldPassword))return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
+
+            System.out.println();
+            System.out.println();
+            System.out.println(user.getPassword());
+            System.out.println();
+            System.out.println();
+            System.out.println(bCryptPasswordEncoder.encode(oldPassword));
+            System.out.println();
+            System.out.println();
+
+            if(!Objects.equals(user.getPassword(), bCryptPasswordEncoder.encode(oldPassword)))return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
 
             user.setPassword(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
