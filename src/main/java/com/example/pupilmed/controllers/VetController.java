@@ -137,8 +137,8 @@ public class VetController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String authHeader, @RequestBody PasswordChangeRequest newPassword){
-        return userService.changePassword(authHeader,newPassword.password());
+    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String authHeader, @RequestBody PasswordChangeRequest payload){
+        return userService.changePassword(authHeader,payload.newPassword(), payload.oldPassword());
     }
 
     @GetMapping(path = "/get-visit-types")

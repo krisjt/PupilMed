@@ -98,7 +98,7 @@ public class UserService {
         return new ResponseEntity<>("Unknown role.", HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<String> changePassword(String authHeader, String newPassword) {
+    public ResponseEntity<String> changePassword(String authHeader, String newPassword, String oldPassword) {
 
         if(newPassword == null || newPassword.equals(""))return new ResponseEntity<>("Password can't be empty.", HttpStatus.BAD_REQUEST);
 
@@ -106,8 +106,10 @@ public class UserService {
 
         Optional<User> optUser = userRepository.findByUsername(username);
 
+
         if(optUser.isPresent()){
             User user = optUser.get();
+            if(!Objects.equals(user.getPassword(), oldPassword))return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
 
             user.setPassword(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
@@ -116,47 +118,12 @@ public class UserService {
         }
         return new ResponseEntity<>("Couldn't find user.", HttpStatus.NOT_FOUND);
     }
-
-//    public ResponseEntity<String> changePassword(String authHeader, String newPassword) {
-//        if(newPassword == null || newPassword.equals("")) {
-//            return new ResponseEntity<>("Password can't be empty.", HttpStatus.BAD_REQUEST);
-//        }
-//
-//        String plainPassword;
-//        try {
-//            if (newPassword.startsWith("{")) {
-//                plainPassword = newPassword
-//                        .replace("{", "")
-//                        .replace("}", "")
-//                        .replace("\"password\":", "")
-//                        .replace("\"", "")
-//                        .trim();
-//            } else {
-//                plainPassword = newPassword;
-//            }
-//
-//            System.out.println("Extracted plain password: " + plainPassword);
-//
-//            String username = jwtUtils.getUsernameFromHeader(authHeader);
-//            Optional<User> optUser = userRepository.findByUsername(username);
-//
-//            if(optUser.isPresent()) {
-//                User user = optUser.get();
-//                String encodedPassword = bCryptPasswordEncoder.encode(plainPassword);
-//
-//                user.setPassword(encodedPassword);
-//                userRepository.save(user);
-//
-//                User savedUser = userRepository.findByUsername(username).orElseThrow();
-//                boolean matches = bCryptPasswordEncoder.matches(plainPassword, savedUser.getPassword());
-//                System.out.println("Password verification after save: " + matches);
-//
-//                return new ResponseEntity<>("Password changed successfully.", HttpStatus.OK);
-//            }
-//            return new ResponseEntity<>("Couldn't find user.", HttpStatus.NOT_FOUND);
-//
-//        } catch (Exception e) {
-//            return new ResponseEntity<>("Invalid password format", HttpStatus.BAD_REQUEST);
-//        }
-//    }
 }
+//Pagination
+//{
+//content: []
+//pages : int
+//records: int
+//}
+
+//TODO sprawdzic czy gety nie maja body
