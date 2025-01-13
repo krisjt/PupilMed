@@ -118,7 +118,7 @@ public class UserService {
             System.out.println();
             System.out.println();
 
-            if(!Objects.equals(user.getPassword(), bCryptPasswordEncoder.encode(oldPassword)))return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
+            if(!bCryptPasswordEncoder.matches(user.getPassword(), bCryptPasswordEncoder.encode(oldPassword)))return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
 
             user.setPassword(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
