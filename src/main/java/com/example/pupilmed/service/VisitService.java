@@ -190,6 +190,11 @@ public class VisitService{
 
     public ResponseEntity<String> addVisit(Vet vet, VetVisitRequest payload) {
 
+        User user = userService.getUserByUsername(payload.ownerPhoneNumber());
+        if(user == null)return new ResponseEntity<>("User doesn't exist.", HttpStatus.NOT_FOUND);
+
+        if(!user.isActive())return new ResponseEntity<>("User is not active.", HttpStatus.CONFLICT);
+
         ResponseEntity<String> validation = validateVisitData(vet,payload);
 
         if((validation.hasBody() && validation.getBody().equals("Visit does not exist."))||validation.getStatusCode()==HttpStatus.OK){

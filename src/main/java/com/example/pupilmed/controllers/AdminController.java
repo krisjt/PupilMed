@@ -127,23 +127,20 @@ public class AdminController {
     public List<Pet> getPets(){
         return petService.getPets();
     }
-
     @PostMapping("/add-pet")
     public ResponseEntity<String> addPet(@RequestBody PetRequest payload){
         return petService.addPet(payload);
     }
-
     @PutMapping("/modify-pet")
     public ResponseEntity<String> modifyPet(@RequestBody PetRequest payload, @RequestParam("petID") Integer petID){
         return petService.modifyPet(petID,payload);
     }
-
     @DeleteMapping("/delete-pet")
     public ResponseEntity<String> deletePet(@RequestParam("petID")Integer petID){
         return petService.deletePetById(petID);
     }
 
-
+    //USERS
     @GetMapping("/get-users")
     public List<UserResponse> getUsers(){
         return userService.getAllUsers();
@@ -157,6 +154,10 @@ public class AdminController {
     @PutMapping("/modify-user")
     public ResponseEntity<String> modifyUser(@RequestBody UserRequest payload, @RequestParam("userID") Integer userID){
         return userService.modifyUser(payload, userID);
+    }
+    @PutMapping("/change-is-active")
+    public ResponseEntity<String> changeIsActive(@RequestBody IsActiveRequest payload){
+        return userService.changeIsActive(payload);
     }
 
     @DeleteMapping("/delete-user")

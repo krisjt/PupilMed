@@ -2,6 +2,7 @@ package com.example.pupilmed.service;
 
 import com.example.pupilmed.models.database.Owner;
 import com.example.pupilmed.models.database.Pet;
+import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.models.server.PetRequest;
 import com.example.pupilmed.repositories.PetRepository;
 import com.example.pupilmed.security.auth.jwt.JwtUtils;
@@ -22,15 +23,17 @@ public class PetService {
 
     private PetRepository petRepository;
     private OwnerService ownerService;
+    private UserService userService;
     private JwtUtils jwtUtils;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public PetService(PetRepository petRepository, OwnerService ownerService, JwtUtils jwtUtils) {
+    public PetService(PetRepository petRepository, OwnerService ownerService, UserService userService, JwtUtils jwtUtils) {
         this.petRepository = petRepository;
         this.ownerService = ownerService;
+        this.userService = userService;
         this.jwtUtils = jwtUtils;
     }
 
@@ -65,13 +68,18 @@ public class PetService {
     }
 
     public ResponseEntity<String> addPet(PetRequest payload) {
-        if(payload.petDob() == null || payload.petSpecies() == null || payload.petBreed() == null || payload.petName() == null || payload.ownerPhoneNumber() == null)
-            return new ResponseEntity<>("Some fields are missing.", HttpStatus.BAD_REQUEST);
 
         Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
         if(owner == null)
             return new ResponseEntity<>("Owner does not exist.", HttpStatus.NOT_FOUND);
 
+        User user = owner.getUser();
+        if(user == null)return new ResponseEntity<>("User doesn't exist.", HttpStatus.NOT_FOUND);
+
+        if(!user.isActive())return new ResponseEntity<>("User is not active.", HttpStatus.CONFLICT);
+
+        if(payload.petDob() == null || payload.petSpecies() == null || payload.petBreed() == null || payload.petName() == null || payload.ownerPhoneNumber() == null)
+            return new ResponseEntity<>("Some fields are missing.", HttpStatus.BAD_REQUEST);
 
         Pet pet = new Pet(payload.petName(), payload.petSpecies(), payload.petBreed(), parseDate(payload.petDob()),owner);
 

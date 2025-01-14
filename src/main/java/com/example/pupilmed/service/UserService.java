@@ -4,6 +4,7 @@ import com.example.pupilmed.models.database.Owner;
 import com.example.pupilmed.models.database.Role;
 import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.models.database.Vet;
+import com.example.pupilmed.models.server.IsActiveRequest;
 import com.example.pupilmed.models.server.UserRequest;
 import com.example.pupilmed.models.server.UserResponse;
 import com.example.pupilmed.repositories.UserRepository;
@@ -27,7 +28,6 @@ public class UserService {
     private OwnerService ownerService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder bCryptPasswordEncoder;
-
 
     @Autowired
     public UserService(UserRepository userRepository, VetService vetService, OwnerService ownerService, JwtUtils jwtUtils, PasswordEncoder bCryptPasswordEncoder) {
@@ -53,11 +53,11 @@ public class UserService {
         List<UserResponse> response = new ArrayList<>();
 
         for(Owner owner : owners){
-            response.add(new UserResponse(owner.getUser().getId(),Role.OWNER,owner.getName(),owner.getSurname(),owner.getUser().getUsername(), null,null));
+            response.add(new UserResponse(owner.getUser().getId(),Role.OWNER,owner.getName(),owner.getSurname(),owner.getUser().getUsername(), null,null,owner.getUser().isActive()));
         }
 
         for(Vet vet : vets){
-            response.add(new UserResponse(vet.getUser().getId(),Role.VET,vet.getName(),vet.getSurname(),vet.getUser().getUsername(), vet.getClinicAddress(), vet.getClinicName()));
+            response.add(new UserResponse(vet.getUser().getId(),Role.VET,vet.getName(),vet.getSurname(),vet.getUser().getUsername(), vet.getClinicAddress(), vet.getClinicName(),vet.getUser().isActive()));
         }
 
         return response;
@@ -75,8 +75,13 @@ public class UserService {
 
     public ResponseEntity<String> modifyUser(UserRequest payload, Integer id) {
 
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty())return new ResponseEntity<>("User with id does not exist.", HttpStatus.NOT_FOUND);
+
         if(!userRepository.existsByRoleAndId(Role.valueOf(payload.role()), id))
             return new ResponseEntity<>("Role is not valid.", HttpStatus.BAD_REQUEST);
+
+        if(user.get().isActive())return new ResponseEntity<>("You can't modify not active user.",HttpStatus.CONFLICT);
 
         if(Objects.equals(payload.role(), Role.VET.toString()))
             return vetService.modifyVet(payload, id);
@@ -109,15 +114,6 @@ public class UserService {
         if(optUser.isPresent()){
             User user = optUser.get();
 
-            System.out.println();
-            System.out.println();
-            System.out.println(user.getPassword());
-            System.out.println();
-            System.out.println();
-            System.out.println(bCryptPasswordEncoder.encode(oldPassword));
-            System.out.println();
-            System.out.println();
-
             if (!bCryptPasswordEncoder.matches(oldPassword, user.getPassword()))
                 return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
 
@@ -128,6 +124,18 @@ public class UserService {
         }
         return new ResponseEntity<>("Couldn't find user.", HttpStatus.NOT_FOUND);
     }
+
+    public ResponseEntity<String> changeIsActive(IsActiveRequest payload) {
+        Optional<User> user = userRepository.findById(payload.id());
+        if(user.isEmpty())return new ResponseEntity<>("User doesn't exist.", HttpStatus.NOT_FOUND);
+
+        user.get().setActive(payload.isActive());
+
+        if(payload.isActive())
+            return new ResponseEntity<>("User is set to active.",HttpStatus.OK);
+        else
+            return new ResponseEntity<>("User is set to not active.",HttpStatus.OK);
+    }
 }
 //Pagination
 //{
@@ -135,5 +143,3 @@ public class UserService {
 //pages : int
 //records: int
 //}
-
-//TODO sprawdzic czy gety nie maja body

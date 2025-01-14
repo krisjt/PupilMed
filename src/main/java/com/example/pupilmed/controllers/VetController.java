@@ -153,5 +153,5 @@ public class VetController {
 }
 
 //    @PreAuthorize("hasRole('ADMIN')") do jednego
-//TODO zrobic DTO a nie Visit
+//TODO zrobic DTO
 //TODO ograniczyc mozliwosc wysylania zapytan zwiazanych z nienalezacymi do weterynarza wizytami
