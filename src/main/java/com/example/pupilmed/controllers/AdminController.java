@@ -58,7 +58,7 @@ public class AdminController {
             if (vet != null)
                 return visitService.addVisit(vet, payload);
 
-            return new ResponseEntity<>("Vet doesn't exist.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Weterynarz o podanym numerze nie istnieje.", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
     }
@@ -70,9 +70,18 @@ public class AdminController {
 
     @PutMapping("/modify-visit")
     public ResponseEntity<String> modifyVisit(@RequestBody VetVisitRequest payload) {
-        if(payload.vetPhoneNumber() == null)
-            return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
-        return visitService.modifyVisit(payload);
+
+        if(payload.vetPhoneNumber() != null) {
+            String vetPhoneNumber = payload.vetPhoneNumber();
+
+            Vet vet = vetService.getVetByUsername(vetPhoneNumber);
+
+            if (vet != null)
+                return visitService.modifyVisit(payload);
+
+            return new ResponseEntity<>("Weterynarz o podanym numerze nie istnieje.", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>("Vet phone number is empty.", HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/delete-visit")

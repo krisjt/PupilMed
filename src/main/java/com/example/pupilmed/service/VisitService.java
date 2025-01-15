@@ -70,21 +70,45 @@ public class VisitService{
 
             Optional<Visit> dbV = getVisitByID(payload.id());
             if(dbV.isPresent()) {
+                Vet vet = null;
                 Visit dbVisit = dbV.get();
-                Vet vet = dbVisit.getVet(); //wizyta nie moze istniec bez weterynarza
+                if(payload.vetPhoneNumber() != null) {
+                    vet = vetService.getVetByUsername(payload.vetPhoneNumber());
+                } else {
+                    vet = dbVisit.getVet();
+                }
+
+                if (vet == null) {
+                    return new ResponseEntity<>("Weterynarz o podanym numerze telefonu nie istnieje....", HttpStatus.NOT_FOUND);
+                }
+                if (!vet.getUser().isActive()) {
+                    return new ResponseEntity<>("Weterynarz o podanym numerze nie jest aktywny w systemie.", HttpStatus.CONFLICT);
+                }
+
+                Date newDate = parseDate(payload.date());
+                Time newTime = parseTime(payload.hour());
+
+                // Sprawdzamy, czy data i godzina zmieniły się
+                if (!dbVisit.getDate().equals(newDate) || !dbVisit.getHour().equals(newTime)) {
+                    // Jeśli zmieniły się, sprawdzamy, czy istnieje konflikt
+                    if (getExistingByDateAndVetAndHour(newDate, vet, newTime).size() > 0) {
+                        return new ResponseEntity<>("Już istnieje wizyta na podaną datę i godzinę.", HttpStatus.CONFLICT);
+                    }
+                }
 
                 ResponseEntity<String> validation = validateVisitData(vet, payload);
 
                 if (validation.getStatusCode() == HttpStatus.OK) {
 
                     Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
-                    if(owner == null)return new ResponseEntity<>("Owner does not exist.",HttpStatus.NOT_FOUND);
+                    if(owner == null)return new ResponseEntity<>("Właściciel o podanym numerze nie istnieje.",HttpStatus.NOT_FOUND);
                     Pet pet = petService.getPetByNameAndOwner(payload.petName(), owner);
-                    if(pet == null) return new ResponseEntity<>("Pet does not exist.",HttpStatus.NOT_FOUND);
+                    if(pet == null) return new ResponseEntity<>("Właściciel nie ma zwierzęcia o podanym imieniu.",HttpStatus.NOT_FOUND);
 
                     dbVisit.setDate(parseDate(payload.date()));
                     dbVisit.setHour(parseTime(payload.hour()));
                     dbVisit.setPet(pet);
+                    dbVisit.setVet(vet);
                     dbVisit.setVisitType(payload.visitType());
                     dbVisit.setPrice(payload.price());
 
@@ -193,9 +217,9 @@ public class VisitService{
     public ResponseEntity<String> addVisit(Vet vet, VetVisitRequest payload) {
 
         User user = userService.getUserByUsername(payload.ownerPhoneNumber());
-        if(user == null)return new ResponseEntity<>("Owner doesn't exist.", HttpStatus.NOT_FOUND);
+        if(user == null)return new ResponseEntity<>("Właściciel o takim numerze nie istnieje.", HttpStatus.NOT_FOUND);
 
-        if(!user.isActive())return new ResponseEntity<>("Owner is not active.", HttpStatus.CONFLICT);
+        if(!user.isActive())return new ResponseEntity<>("Właściciel o podanym numerze nie jest aktywny w systemie.", HttpStatus.CONFLICT);
 
         ResponseEntity<String> validation = validateVisitData(vet,payload);
 
@@ -214,36 +238,36 @@ public class VisitService{
         String phoneNumber = payload.ownerPhoneNumber();
 
         if (!userService.existsByUsernameAndRole(phoneNumber, Role.OWNER)) {
-            return new ResponseEntity<>("Owner does not exist.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Właściciel o podanym numerze nie istnieje.", HttpStatus.NOT_FOUND);
         }
         if (!userService.existsByUsernameAndRole(vet.getUser().getUsername(), Role.VET)) {
-            return new ResponseEntity<>("Vet does not exist.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Weterynarz o podanym numerze nie istnieje.", HttpStatus.NOT_FOUND);
         }
-        if(!userService.getUserByUsername(payload.ownerPhoneNumber()).isActive())return new ResponseEntity<>("Owner is not active.", HttpStatus.CONFLICT);
-        if(!vet.getUser().isActive())return new ResponseEntity<>("Vet is not active.", HttpStatus.CONFLICT);
+        if(!userService.getUserByUsername(payload.ownerPhoneNumber()).isActive())return new ResponseEntity<>("Właściciel o podanym numerze nie jest aktywny w systemie.", HttpStatus.CONFLICT);
+        if(!vet.getUser().isActive())return new ResponseEntity<>("Weterynarz o podanym numerze nie jest aktywny w systemie.", HttpStatus.CONFLICT);
 
         String petName = payload.petName();
         Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
 
         if (!petService.existsByNameAndUser(petName, owner))
-            return new ResponseEntity<>("Pet is not related to the owner.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Podany właściciel nie ma zwierzęcia o podanym imieniu.", HttpStatus.BAD_REQUEST);
 
 
         Date date = parseDate(payload.date());
         Time time = parseTime(payload.hour());
 
         if (date.before(new Date()))
-            return new ResponseEntity<>("You can't set date before current date.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Nie można dodawać wizyt na minione dni.", HttpStatus.BAD_REQUEST);
 
         if(payload.id()!= null) {
             Optional<Visit> dbV = getVisitByID(payload.id());
             if (dbV.isEmpty()) return new ResponseEntity<>("Visit does not exist.", HttpStatus.NOT_FOUND);
             if(getExistingByDateAndVetAndHour(date,vet,time).size()>1)
-                return new ResponseEntity<>("Date and time are already taken by another visit.", HttpStatus.CONFLICT);
+                return new ResponseEntity<>("Już istnieje wizyta na daną datę i godzinę.", HttpStatus.CONFLICT);
         }
         else if (payload.id() == null){
             if (existsByDateAndVetAndHour(date, vet, time))
-                return new ResponseEntity<>("Date and time are already taken by another visit.", HttpStatus.CONFLICT);
+                return new ResponseEntity<>("Już istnieje wizyta na daną datę i godzinę.", HttpStatus.CONFLICT);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

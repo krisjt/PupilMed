@@ -69,9 +69,9 @@ public class VetService {
         if(payload.phoneNumber() == null || payload.role() == null || payload.name() == null || payload.surname() == null || payload.clinicName() == null || payload.clinicAddress() == null || payload.password() == null)
             return new ResponseEntity<>("Fields are missing.", HttpStatus.BAD_REQUEST);
 
-        if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Username is taken.", HttpStatus.CONFLICT);
+        if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Już istnieje użytkownik o tym numerze.", HttpStatus.CONFLICT);
 
-        if(payload.password().length() < 5)return new ResponseEntity<>("Password is too short.", HttpStatus.BAD_REQUEST);
+        if(payload.password().length() < 5)return new ResponseEntity<>("Hasło jest za krótkie.", HttpStatus.BAD_REQUEST);
 
         User user = new User(payload.phoneNumber(), bCryptPasswordEncoder.encode(payload.password()), true, Role.VET);
         userRepository.save(user);
@@ -92,9 +92,8 @@ public class VetService {
             User user = optionalUser.get();
             Vet vet = vetRepository.getVetByUser(user);
 
-            if(payload.password() == null || payload.password().length() < 5)return new ResponseEntity<>("Password is too short.", HttpStatus.BAD_REQUEST);
             if(payload.phoneNumber() == null)return new ResponseEntity<>("Phone number is empty.", HttpStatus.BAD_REQUEST);
-            if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Username is taken.",HttpStatus.CONFLICT);
+            if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Już istnieje użytkownik o tym numerze.",HttpStatus.CONFLICT);
             user.setPassword(bCryptPasswordEncoder.encode(payload.password()));
             user.setUsername(payload.phoneNumber());
 

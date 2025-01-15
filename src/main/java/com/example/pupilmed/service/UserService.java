@@ -82,7 +82,7 @@ public class UserService {
         if(!userRepository.existsByRoleAndId(Role.valueOf(payload.role()), id))
             return new ResponseEntity<>("Role is not valid.", HttpStatus.BAD_REQUEST);
 
-        if(user.get().isActive())return new ResponseEntity<>("You can't modify not active user.",HttpStatus.CONFLICT);
+        if(!user.get().isActive())return new ResponseEntity<>("You can't modify not active user.",HttpStatus.CONFLICT);
 
         if(Objects.equals(payload.role(), Role.VET.toString()))
             return vetService.modifyVet(payload, id);
@@ -107,9 +107,9 @@ public class UserService {
     public ResponseEntity<String> changePassword(String authHeader, PasswordChangeRequest payload) {
 
         if(payload.newPassword() == null || payload.newPassword().equals(""))return new ResponseEntity<>("New password can't be empty.", HttpStatus.BAD_REQUEST);
-        if(payload.newPassword().length() < 5)return new ResponseEntity<>("Password is too short.", HttpStatus.BAD_REQUEST);
+        if(payload.newPassword().length() < 5)return new ResponseEntity<>("Hasło jest za krótkie.", HttpStatus.BAD_REQUEST);
         if(payload.currentPassword() == null || payload.currentPassword().equals(""))return new ResponseEntity<>("Old password can't be empty.", HttpStatus.BAD_REQUEST);
-        if(payload.currentPassword().equals(payload.newPassword()))return new ResponseEntity<>("Passwords don't differ.", HttpStatus.CONFLICT);
+        if(payload.currentPassword().equals(payload.newPassword()))return new ResponseEntity<>("Nowe hasło jest takie samo jak stare.", HttpStatus.CONFLICT);
         String username = jwtUtils.getUsernameFromHeader(authHeader);
 
         Optional<User> optUser = userRepository.findByUsername(username);
@@ -118,7 +118,7 @@ public class UserService {
             User user = optUser.get();
 
             if (!bCryptPasswordEncoder.matches(payload.currentPassword(), user.getPassword()))
-                return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
+                return new ResponseEntity<>("Podane złe aktualne hasło.", HttpStatus.CONFLICT);
 
             user.setPassword(bCryptPasswordEncoder.encode(payload.newPassword()));
             userRepository.save(user);
@@ -129,10 +129,14 @@ public class UserService {
     }
 
     public ResponseEntity<String> changeIsActive(IsActiveRequest payload) {
+        System.out.println("payload" + payload);
         Optional<User> user = userRepository.findById(payload.id());
         if(user.isEmpty())return new ResponseEntity<>("User doesn't exist.", HttpStatus.NOT_FOUND);
 
-        user.get().setActive(payload.isActive());
+        User existingUser = user.get();
+        existingUser.setActive(payload.isActive());
+
+        userRepository.save(existingUser);
 
         if(payload.isActive())
             return new ResponseEntity<>("User is set to active.",HttpStatus.OK);
