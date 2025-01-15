@@ -71,14 +71,16 @@ public class VisitService{
             Optional<Visit> dbV = getVisitByID(payload.id());
             if(dbV.isPresent()) {
                 Visit dbVisit = dbV.get();
-                Vet vet = dbVisit.getVet();
+                Vet vet = dbVisit.getVet(); //wizyta nie moze istniec bez weterynarza
 
                 ResponseEntity<String> validation = validateVisitData(vet, payload);
 
                 if (validation.getStatusCode() == HttpStatus.OK) {
 
                     Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
+                    if(owner == null)return new ResponseEntity<>("Owner does not exist.",HttpStatus.NOT_FOUND);
                     Pet pet = petService.getPetByNameAndOwner(payload.petName(), owner);
+                    if(pet == null) return new ResponseEntity<>("Pet does not exist.",HttpStatus.NOT_FOUND);
 
                     dbVisit.setDate(parseDate(payload.date()));
                     dbVisit.setHour(parseTime(payload.hour()));
@@ -191,15 +193,16 @@ public class VisitService{
     public ResponseEntity<String> addVisit(Vet vet, VetVisitRequest payload) {
 
         User user = userService.getUserByUsername(payload.ownerPhoneNumber());
-        if(user == null)return new ResponseEntity<>("User doesn't exist.", HttpStatus.NOT_FOUND);
+        if(user == null)return new ResponseEntity<>("Owner doesn't exist.", HttpStatus.NOT_FOUND);
 
-        if(!user.isActive())return new ResponseEntity<>("User is not active.", HttpStatus.CONFLICT);
+        if(!user.isActive())return new ResponseEntity<>("Owner is not active.", HttpStatus.CONFLICT);
 
         ResponseEntity<String> validation = validateVisitData(vet,payload);
 
         if((validation.hasBody() && validation.getBody().equals("Visit does not exist."))||validation.getStatusCode()==HttpStatus.OK){
             Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
             Pet pet = petService.getPetByNameAndOwner(payload.petName(),owner);
+
             Visit visit = new Visit(parseDate(payload.date()), parseTime(payload.hour()), payload.visitType(), payload.price(), vet, pet);
             visitRepository.save(visit);
             return new ResponseEntity<>("Visit added successfully.", HttpStatus.OK);
@@ -213,6 +216,12 @@ public class VisitService{
         if (!userService.existsByUsernameAndRole(phoneNumber, Role.OWNER)) {
             return new ResponseEntity<>("Owner does not exist.", HttpStatus.NOT_FOUND);
         }
+        if (!userService.existsByUsernameAndRole(vet.getUser().getUsername(), Role.VET)) {
+            return new ResponseEntity<>("Vet does not exist.", HttpStatus.NOT_FOUND);
+        }
+        if(!userService.getUserByUsername(payload.ownerPhoneNumber()).isActive())return new ResponseEntity<>("Owner is not active.", HttpStatus.CONFLICT);
+        if(!vet.getUser().isActive())return new ResponseEntity<>("Vet is not active.", HttpStatus.CONFLICT);
+
         String petName = payload.petName();
         Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
 

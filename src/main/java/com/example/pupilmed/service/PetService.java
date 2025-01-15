@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,8 +76,9 @@ public class PetService {
 
         User user = owner.getUser();
         if(user == null)return new ResponseEntity<>("User doesn't exist.", HttpStatus.NOT_FOUND);
-
         if(!user.isActive())return new ResponseEntity<>("User is not active.", HttpStatus.CONFLICT);
+        if(parseDate(payload.petDob()).after(new Date()))return new ResponseEntity<>("Date of birth can't be in future.",HttpStatus.CONFLICT);
+        if(petRepository.existsByNameAndOwner(payload.petName(),owner))return new ResponseEntity<>("Pet with that name and owner already exists.", HttpStatus.CONFLICT);
 
         if(payload.petDob() == null || payload.petSpecies() == null || payload.petBreed() == null || payload.petName() == null || payload.ownerPhoneNumber() == null)
             return new ResponseEntity<>("Some fields are missing.", HttpStatus.BAD_REQUEST);
@@ -88,8 +90,11 @@ public class PetService {
                 return new ResponseEntity<>("Additional info is to short.", HttpStatus.BAD_REQUEST);
             pet.setAdditionalInfo(payload.additionalInfo());
         }
-
-        petRepository.save(pet);
+        try {
+            petRepository.save(pet);
+        }catch(Exception e){
+            return new ResponseEntity<>("Adding to db failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return new ResponseEntity<>("Pet added successfully.",HttpStatus.OK);
     }
@@ -105,7 +110,9 @@ public class PetService {
 
         Owner owner = ownerService.getOwnerByUsername(payload.ownerPhoneNumber());
         if(owner == null)return new ResponseEntity<>("Owner does not exist in database.", HttpStatus.NOT_FOUND);
-
+        if(!owner.getUser().isActive())return new ResponseEntity<>("User is not active.", HttpStatus.CONFLICT);
+        if(parseDate(payload.petDob()).before(new Date()))return new ResponseEntity<>("Date of birth can't be in future.",HttpStatus.CONFLICT);
+        if(petRepository.existsByNameAndOwner(payload.petName(),owner))return new ResponseEntity<>("Pet with that name and owner already exists.", HttpStatus.CONFLICT);
 
         if(payload.petSpecies() != null && !payload.petSpecies().equals(""))pet.setSpecies(payload.petSpecies());
         if(payload.petDob() != null && !payload.petDob().equals(""))pet.setDateOfBirth(parseDate(payload.petDob()));

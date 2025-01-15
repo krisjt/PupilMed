@@ -52,7 +52,6 @@ public class OwnerController {
         return visitService.getVisitsByOwnerUsernameBetweenDates(authHeader,startDate,endDate);
     }
 
-    //testowac:
     @GetMapping("/visit-details")
     public VetVisitDetails getVisitDetails(@RequestHeader("Authorization") String authHeader, @RequestParam("visitID") Integer visitID) {
         return visitService.getVisitDetails(visitID,authHeader);
@@ -80,7 +79,7 @@ public class OwnerController {
 
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String authHeader, @RequestBody PasswordChangeRequest payload){
-        return userService.changePassword(authHeader,payload.newPassword(),payload.oldPassword());
+        return userService.changePassword(authHeader,payload);
     }
 
     @GetMapping(path = "/get-visit-types")

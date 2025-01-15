@@ -119,6 +119,13 @@ public class VetController {
         User user = userService.getUserByUsername(username);
         Vet vet = vetService.getVetByUser(user);
 
+        System.out.println();
+        System.out.println();
+        System.out.println(vet);
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
         if(vet == null){
             return new ResponseEntity<>("Vet does not exist.", HttpStatus.NOT_FOUND);
         }
@@ -138,7 +145,7 @@ public class VetController {
 
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String authHeader, @RequestBody PasswordChangeRequest payload){
-        return userService.changePassword(authHeader,payload.newPassword(), payload.oldPassword());
+        return userService.changePassword(authHeader,payload);
     }
 
     @GetMapping(path = "/get-visit-types")

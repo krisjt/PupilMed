@@ -5,6 +5,7 @@ import com.example.pupilmed.models.database.Role;
 import com.example.pupilmed.models.database.User;
 import com.example.pupilmed.models.database.Vet;
 import com.example.pupilmed.models.server.IsActiveRequest;
+import com.example.pupilmed.models.server.PasswordChangeRequest;
 import com.example.pupilmed.models.server.UserRequest;
 import com.example.pupilmed.models.server.UserResponse;
 import com.example.pupilmed.repositories.UserRepository;
@@ -103,10 +104,12 @@ public class UserService {
         return new ResponseEntity<>("Unknown role.", HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<String> changePassword(String authHeader, String newPassword, String oldPassword) {
+    public ResponseEntity<String> changePassword(String authHeader, PasswordChangeRequest payload) {
 
-        if(newPassword == null || newPassword.equals(""))return new ResponseEntity<>("Password can't be empty.", HttpStatus.BAD_REQUEST);
-
+        if(payload.newPassword() == null || payload.newPassword().equals(""))return new ResponseEntity<>("New password can't be empty.", HttpStatus.BAD_REQUEST);
+        if(payload.newPassword().length() < 5)return new ResponseEntity<>("Password is too short.", HttpStatus.BAD_REQUEST);
+        if(payload.currentPassword() == null || payload.currentPassword().equals(""))return new ResponseEntity<>("Old password can't be empty.", HttpStatus.BAD_REQUEST);
+        if(payload.currentPassword().equals(payload.newPassword()))return new ResponseEntity<>("Passwords don't differ.", HttpStatus.CONFLICT);
         String username = jwtUtils.getUsernameFromHeader(authHeader);
 
         Optional<User> optUser = userRepository.findByUsername(username);
@@ -114,10 +117,10 @@ public class UserService {
         if(optUser.isPresent()){
             User user = optUser.get();
 
-            if (!bCryptPasswordEncoder.matches(oldPassword, user.getPassword()))
+            if (!bCryptPasswordEncoder.matches(payload.currentPassword(), user.getPassword()))
                 return new ResponseEntity<>("Passwords don't match.", HttpStatus.CONFLICT);
 
-            user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+            user.setPassword(bCryptPasswordEncoder.encode(payload.newPassword()));
             userRepository.save(user);
 
             return new ResponseEntity<>("Password changed successfully.", HttpStatus.OK);

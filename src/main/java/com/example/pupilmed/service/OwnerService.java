@@ -86,6 +86,7 @@ public class OwnerService {
 
             if(payload.password() == null || payload.password().length() < 5)return new ResponseEntity<>("Password is too short.", HttpStatus.BAD_REQUEST);
             if(payload.phoneNumber() == null)return new ResponseEntity<>("Phone number is empty.", HttpStatus.BAD_REQUEST);
+            if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Username is taken.",HttpStatus.CONFLICT);
 
             user.setPassword(bCryptPasswordEncoder.encode(payload.password()));
             user.setUsername(payload.phoneNumber());
