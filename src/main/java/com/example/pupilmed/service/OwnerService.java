@@ -85,9 +85,10 @@ public class OwnerService {
             Owner owner = ownerRepository.findOwnerByUser(user);
 
             if(payload.phoneNumber() == null)return new ResponseEntity<>("Phone number is empty.", HttpStatus.BAD_REQUEST);
-            if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Już istnieje użytkownik o tym numerze.",HttpStatus.CONFLICT);
+            if (!user.getUsername().equals(payload.phoneNumber()) && userRepository.existsByUsername(payload.phoneNumber())) {
+                return new ResponseEntity<>("Już istnieje użytkownik o tym numerze.", HttpStatus.CONFLICT);
+            }
 
-            user.setPassword(bCryptPasswordEncoder.encode(payload.password()));
             user.setUsername(payload.phoneNumber());
 
             userRepository.save(user);

@@ -93,8 +93,7 @@ public class VetService {
             Vet vet = vetRepository.getVetByUser(user);
 
             if(payload.phoneNumber() == null)return new ResponseEntity<>("Phone number is empty.", HttpStatus.BAD_REQUEST);
-            if(userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Już istnieje użytkownik o tym numerze.",HttpStatus.CONFLICT);
-            user.setPassword(bCryptPasswordEncoder.encode(payload.password()));
+            if(!user.getUsername().equals(payload.phoneNumber()) && userRepository.existsByUsername(payload.phoneNumber()))return new ResponseEntity<>("Już istnieje użytkownik o tym numerze.",HttpStatus.CONFLICT);
             user.setUsername(payload.phoneNumber());
 
             userRepository.save(user);
